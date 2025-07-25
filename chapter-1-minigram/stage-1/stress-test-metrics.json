@@ -1,0 +1,13 @@
+{
+  "scenarios": [
+    {
+      "numUsers": 5,
+      "duration": 204,
+      "totalOps": 45,
+      "successRate": 55.55555555555556,
+      "peakRPS": 1.46,
+      "peakResponseTime": 13.95
+    }
+  ],
+  "timestamp": "2025-07-25T17:30:45.075Z"
+}

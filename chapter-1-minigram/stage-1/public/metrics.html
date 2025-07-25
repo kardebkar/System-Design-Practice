@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MiniGram Stage 1 - Metrics Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0f0f0f;
+            color: #e0e0e0;
+            padding: 20px;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 10px;
+        }
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        .warning {
+            background: #ff6b6b;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .metric-card {
+            background: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 10px;
+            padding: 20px;
+            transition: transform 0.2s, border-color 0.2s;
+        }
+        .metric-card:hover {
+            transform: translateY(-2px);
+            border-color: #667eea;
+        }
+        .metric-label {
+            font-size: 0.9em;
+            color: #888;
+            margin-bottom: 5px;
+        }
+        .metric-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #667eea;
+        }
+        .metric-trend {
+            font-size: 0.8em;
+            color: #888;
+            margin-top: 5px;
+        }
+        .chart-container {
+            background: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            height: 300px;
+        }
+        .endpoint-list {
+            background: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 10px;
+            padding: 20px;
+        }
+        .endpoint-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #333;
+        }
+        .status-good { color: #4caf50; }
+        .status-warning { color: #ff9800; }
+        .status-bad { color: #f44336; }
+        .refresh-info {
+            text-align: center;
+            color: #666;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🚀 MiniGram Stage 1 - Metrics Dashboard</h1>
+        <p>Single Server Architecture Monitoring</p>
+    </div>
+
+    <div class="warning">
+        ⚠️ Stage 1 Limitations: No caching, no load balancing, SQLite database, single process
+    </div>
+
+    <div class="metrics-grid">
+        <div class="metric-card">
+            <div class="metric-label">Requests per Second</div>
+            <div class="metric-value" id="rps">0</div>
+            <div class="metric-trend" id="rps-trend"></div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-label">Active Connections</div>
+            <div class="metric-value" id="connections">0</div>
+            <div class="metric-trend">Concurrent users</div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-label">Average Response Time</div>
+            <div class="metric-value" id="response-time">0ms</div>
+            <div class="metric-trend" id="response-trend"></div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-label">Error Rate</div>
+            <div class="metric-value" id="error-rate">0%</div>
+            <div class="metric-trend" id="error-trend"></div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-label">Database Queries/sec</div>
+            <div class="metric-value" id="db-qps">0</div>
+            <div class="metric-trend">SQLite operations</div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-label">Memory Usage</div>
+            <div class="metric-value" id="memory">0MB</div>
+            <div class="metric-trend">Heap used</div>
+        </div>
+    </div>
+
+    <div class="chart-container">
+        <h3>Response Time History (last 60 seconds)</h3>
+        <canvas id="responseChart"></canvas>
+    </div>
+
+    <div class="endpoint-list">
+        <h3>API Endpoint Usage</h3>
+        <div id="endpoints"></div>
+    </div>
+
+    <div class="refresh-info">
+        Auto-refreshing every 2 seconds | <span id="uptime"></span>
+    </div>
+
+    <script>
+        const responseTimeHistory = [];
+        let previousMetrics = null;
+
+        async function fetchMetrics() {
+            try {
+                const response = await fetch('/api/metrics');
+                const metrics = await response.json();
+                updateDashboard(metrics);
+            } catch (error) {
+                console.error('Failed to fetch metrics:', error);
+            }
+        }
+
+        function updateDashboard(metrics) {
+            // Update metric values
+            document.getElementById('rps').textContent = metrics.requestsPerSecond;
+            document.getElementById('connections').textContent = metrics.activeConnections;
+            document.getElementById('response-time').textContent = metrics.avgResponseTime + 'ms';
+            document.getElementById('error-rate').textContent = metrics.errorRate;
+            document.getElementById('db-qps').textContent = metrics.dbQueriesPerSecond;
+            document.getElementById('memory').textContent = 
+                (metrics.memoryUsage.heapUsed / 1024 / 1024).toFixed(1) + 'MB';
+            document.getElementById('uptime').textContent = 'Uptime: ' + metrics.uptime;
+
+            // Update trends
+            if (previousMetrics) {
+                updateTrend('rps-trend', metrics.requestsPerSecond, previousMetrics.requestsPerSecond);
+                updateTrend('response-trend', metrics.avgResponseTime, previousMetrics.avgResponseTime, true);
+                updateTrend('error-trend', parseFloat(metrics.errorRate), parseFloat(previousMetrics.errorRate));
+            }
+
+            // Update endpoints
+            const endpointsDiv = document.getElementById('endpoints');
+            endpointsDiv.innerHTML = '';
+            for (const [endpoint, count] of Object.entries(metrics.endpoints)) {
+                const item = document.createElement('div');
+                item.className = 'endpoint-item';
+                item.innerHTML = `
+                    <span>${endpoint}</span>
+                    <span>${count} requests</span>
+                `;
+                endpointsDiv.appendChild(item);
+            }
+
+            // Add to history
+            responseTimeHistory.push({
+                time: new Date(),
+                value: parseFloat(metrics.avgResponseTime)
+            });
+            if (responseTimeHistory.length > 30) responseTimeHistory.shift();
+
+            // Update status colors based on performance
+            updateStatusColors(metrics);
+
+            previousMetrics = metrics;
+        }
+
+        function updateTrend(elementId, current, previous, inverse = false) {
+            const element = document.getElementById(elementId);
+            const diff = current - previous;
+            if (diff > 0) {
+                element.textContent = inverse ? '↑ Getting slower' : '↑ Increasing';
+                element.style.color = inverse ? '#f44336' : '#4caf50';
+            } else if (diff < 0) {
+                element.textContent = inverse ? '↓ Getting faster' : '↓ Decreasing';
+                element.style.color = inverse ? '#4caf50' : '#f44336';
+            } else {
+                element.textContent = '→ Stable';
+                element.style.color = '#888';
+            }
+        }
+
+        function updateStatusColors(metrics) {
+            const responseTime = parseFloat(metrics.avgResponseTime);
+            const errorRate = parseFloat(metrics.errorRate);
+            
+            // Response time status
+            const rtElement = document.getElementById('response-time');
+            if (responseTime < 100) {
+                rtElement.className = 'metric-value status-good';
+            } else if (responseTime < 500) {
+                rtElement.className = 'metric-value status-warning';
+            } else {
+                rtElement.className = 'metric-value status-bad';
+            }
+            
+            // Error rate status
+            const erElement = document.getElementById('error-rate');
+            if (errorRate < 1) {
+                erElement.className = 'metric-value status-good';
+            } else if (errorRate < 5) {
+                erElement.className = 'metric-value status-warning';
+            } else {
+                erElement.className = 'metric-value status-bad';
+            }
+        }
+
+        // Initial fetch and set interval
+        fetchMetrics();
+        setInterval(fetchMetrics, 2000);
+    </script>
+</body>
+</html>
