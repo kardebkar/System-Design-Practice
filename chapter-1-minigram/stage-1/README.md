@@ -1,5 +1,5 @@
 # Chapter 1: Scale from Zero to Millions - Stage 1
-
+[![MiniGram CI/CD Pipeline](https://github.com/kardebkar/System-Design-Practice/actions/workflows/ci.yml/badge.svg)](https://github.com/kardebkar/System-Design-Practice/actions/workflows/ci.yml)
 ## 🎯 Stage 1: Single Server Architecture
 
 Everything runs on ONE server:
