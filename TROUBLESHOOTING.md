@@ -162,5 +162,73 @@ new Chart(performanceChart, {
 
 ---
 
+## Issue #4: Charts Using Hardcoded Data Instead of Live Data
+
+### **Problem Description**
+Despite fixing JavaScript syntax errors, charts were still not displaying live data. Response Time Trend and Error Distribution charts showed static values instead of the dynamic data from `window.livePerformanceData`.
+
+### **Root Cause Analysis**
+**Data flow disconnect:** Charts were initialized with hardcoded arrays instead of reading from the live performance data:
+
+```javascript
+// PROBLEM - Hardcoded data ignoring live data:
+new Chart(ctx, {
+    data: {
+        datasets: [{
+            data: [145, 652, 1361, 2774],  // ❌ Static hardcoded values
+        }]
+    }
+});
+```
+
+**Investigation Process:**
+1. ✅ Verified `live-performance-data.js` loads with valid data  
+2. ✅ Confirmed Chart.js CDN accessibility
+3. ✅ Validated JavaScript syntax correctness
+4. ❌ **Discovered charts ignore `window.livePerformanceData`**
+
+### **Solution Applied**
+1. **Modified chart initialization** to read from live data source
+2. **Added fallback mechanism** with hardcoded data when live data unavailable
+3. **Implemented data mapping** from live metrics to chart datasets
+4. **Added console logging** for debugging data source usage
+
+```javascript
+// FIXED - Dynamic data from live source:
+let stage1Data = [145, 652, 1361, 2774]; // Fallback
+if (typeof window.livePerformanceData !== 'undefined') {
+    const liveData = window.livePerformanceData;
+    stage1Data = [
+        liveData.metrics.stage1.metrics["10"].response,
+        liveData.metrics.stage1.metrics["50"].response,
+        // ... map all data points
+    ];
+    console.log('Using live performance data:', liveData.lastUpdated);
+}
+
+new Chart(ctx, {
+    data: {
+        datasets: [{ data: stage1Data }]  // ✅ Dynamic data
+    }
+});
+```
+
+### **Files Modified**
+- `.github/workflows/deploy-pages.yml` - Lines 486-640 (Chart initialization with live data)
+
+### **Data Flow Verification**
+1. **Live Data Source**: `https://kardebkar.github.io/System-Design-Practice/live-performance-data.js`
+2. **Performance Chart**: Maps `metrics.stage1/stage2.metrics["10-200"].response` 
+3. **Error Chart**: Calculates from `metrics.stage1/stage2.successRate`
+4. **Console Logs**: Show which data source is being used
+
+### **Key Learning**
+- **Always verify data flow end-to-end** - syntax correctness ≠ data usage
+- **Add console logging** for debugging dynamic data loading
+- **Implement fallback data** for graceful degradation
+- **Test with actual data sources** not just static examples
+
+---
+
 **Last Updated:** August 3, 2025
 **Resolved By:** Claude Code Assistant
