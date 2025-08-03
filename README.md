@@ -1,12 +1,13 @@
 # 🚀 System Design Practice: Scale from Zero to Millions
 
 ## 📊 Interactive Performance Dashboard
-**[🎯 VIEW LIVE DASHBOARD](./performance-dashboard.html)** - Complete performance comparison with interview insights
+**[🎯 VIEW LIVE DASHBOARD](https://kardebkar.github.io/System-Design-Practice/)** - Real-time performance comparison with CI/CD integration
 
-```bash
-# Quick access to dashboard
-./view-dashboard.sh
-```
+**Features:**
+- 🔄 **Live CI/CD Status** - Real-time GitHub Actions integration
+- 📈 **Interactive Charts** - Response time trends and error distribution
+- 📊 **Performance Metrics** - SQLite vs PostgreSQL comparison
+- 🚀 **Auto-Updates** - Refreshes with every code push
 
 ---
 
@@ -14,14 +15,18 @@
 
 ```
 System-Design-Practice/
-├── 📊 performance-dashboard.html    # Interactive performance dashboard
-├── 🔧 view-dashboard.sh            # Quick dashboard access script
-├── 📋 README.md                    # This file
+├── 🌐 Live Dashboard: https://kardebkar.github.io/System-Design-Practice/
+├── ⚙️ .github/workflows/           # CI/CD automation
+│   ├── ci.yml                     # Performance testing pipeline
+│   └── deploy-pages.yml           # Dashboard deployment
+├── 📊 TROUBLESHOOTING.md          # Complete debugging guide
+├── 🔧 github-pages-setup.md      # Setup instructions
+├── 📋 README.md                   # This file
 └── chapter-1-minigram/
-    ├── stage-1/                    # SQLite implementation
+    ├── stage-1/                   # SQLite implementation
     │   ├── 📊 Performance: 5 users max, 35% error rate
     │   └── 🎯 Interview Gold: Breaking point analysis
-    └── stage-2/                    # PostgreSQL implementation  
+    └── stage-2/                   # PostgreSQL implementation  
         ├── 📊 Performance: 200+ users, <1% error rate
         ├── 🚀 46% faster response times
         └── 🎯 Interview Gold: Scaling architecture decisions
@@ -65,8 +70,18 @@ npm run test:stress     # Comprehensive stress test
 npm run test:breaking   # Find breaking points
 ```
 
-## 📊 Metrics Dashboard
+## 📊 Performance Dashboards
+
+### 🌐 Live Dashboard (Production)
+**[View Live Dashboard](https://kardebkar.github.io/System-Design-Practice/)**
+- Real-time CI/CD status from GitHub Actions
+- Interactive performance charts
+- Automatic updates with every deployment
+
+### 🔧 Local Development Dashboard
 Visit: http://localhost:3000/metrics.html
+- Local performance metrics
+- Real-time server monitoring
 
 ## 🔥 Performance Test Results
 
@@ -189,20 +204,36 @@ This is expected! SQLite can't handle concurrent writes. Document these failures
 
 ## 🎯 Next Steps
 
-1. **Document your metrics:**
+1. **View the Live Dashboard:**
+   ```bash
+   # Open the live performance dashboard
+   open https://kardebkar.github.io/System-Design-Practice/
+   ```
+
+2. **Document your metrics:**
    ```bash
    npm run test:stress > stage1-final-metrics.txt
    ```
 
-2. **Try quick optimizations (optional):**
+3. **Try quick optimizations (optional):**
    * Add connection reuse
    * Implement basic caching
    * Test improvement
 
-3. **Move to Stage 2:**
+4. **Move to Stage 2:**
    ```bash
    cd ../stage-2
    docker-compose up -d
    ```
+
+## 🚀 CI/CD Integration
+
+The project automatically:
+- **Runs performance tests** on every push
+- **Updates the live dashboard** with real results
+- **Compares SQLite vs PostgreSQL** performance
+- **Provides interview-ready metrics** and insights
+
+**GitHub Actions Pipeline:** https://github.com/kardebkar/System-Design-Practice/actions
 
 **Remember:** The "failures" in Stage 1 are actually successes - you've proven why distributed systems exist! 🚀
