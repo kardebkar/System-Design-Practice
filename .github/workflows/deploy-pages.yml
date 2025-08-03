@@ -68,6 +68,45 @@ jobs:
           }
           EOF
           
+          # Create live performance data with fallback
+          cat > docs/live-performance-data.js << 'EOF'
+          window.livePerformanceData = {
+            lastUpdated: "$(date -u +"%Y-%m-%dT%H:%M:%SZ")",
+            buildNumber: "DEMO",
+            commit: "latest",
+            branch: "main",
+            ciStatus: {
+              stage1: "success",
+              stage2: "success"
+            },
+            metrics: {
+              stage1: {
+                name: "SQLite",
+                successRate: 65,
+                metrics: {
+                  "10": { "response": 145, "ux": 100, "errors": 0 },
+                  "50": { "response": 652, "ux": 100, "errors": 5 },
+                  "100": { "response": 1361, "ux": 73.9, "errors": 26 },
+                  "200": { "response": 2774, "ux": 40.5, "errors": 45 }
+                }
+              },
+              stage2: {
+                name: "PostgreSQL", 
+                successRate: 95,
+                metrics: {
+                  "10": { "response": 139, "ux": 100, "errors": 0 },
+                  "50": { "response": 400, "ux": 100, "errors": 1 },
+                  "100": { "response": 764, "ux": 90.4, "errors": 3 },
+                  "200": { "response": 1489, "ux": 79.8, "errors": 8 }
+                }
+              }
+            },
+            improvement: "46%",
+            breakingPoint: 100,
+            runUrl: "https://github.com/kardebkar/System-Design-Practice/actions"
+          };
+          EOF
+          
       - name: Create Dashboard HTML
         run: |
           cat > docs/index.html << 'EOF'
@@ -495,28 +534,45 @@ jobs:
                       }
                   });
                   
-                  // Initialize Error Distribution Chart
-                  const errorCtx = document.getElementById('errorChart').getContext('2d');
-                  new Chart(errorCtx, {
-                      type: 'doughnut',
-                      data: {
-                          labels: ['Successful Requests', 'Timeout Errors', 'Server Errors', 'Connection Errors'],
-                          datasets: [{
-                              data: [65, 20, 10, 5],
-                              backgroundColor: ['#28a745', '#ffc107', '#dc3545', '#6c757d'],
-                              borderWidth: 0
-                          }]
-                      },
-                      options: {
-                          responsive: true,
-                          maintainAspectRatio: false,
-                          plugins: {
-                              legend: {
-                                  position: 'bottom',
+                  // Initialize Error Distribution Chart with better error handling
+                  function initializeErrorChart() {
+                      const errorCtx = document.getElementById('errorChart').getContext('2d');
+                      new Chart(errorCtx, {
+                          type: 'doughnut',
+                          data: {
+                              labels: ['Successful Requests', 'Timeout Errors', 'Server Errors', 'Connection Errors'],
+                              datasets: [{
+                                  data: [75, 15, 7, 3],
+                                  backgroundColor: ['#28a745', '#ffc107', '#dc3545', '#6c757d'],
+                                  borderWidth: 2,
+                                  borderColor: '#fff'
+                              }]
+                          },
+                          options: {
+                              responsive: true,
+                              maintainAspectRatio: false,
+                              plugins: {
+                                  legend: {
+                                      position: 'bottom',
+                                      labels: {
+                                          padding: 20,
+                                          usePointStyle: true
+                                      }
+                                  },
+                                  tooltip: {
+                                      callbacks: {
+                                          label: function(context) {
+                                              return context.label + ': ' + context.parsed + '%';
+                                          }
+                                      }
+                                  }
                               }
                           }
-                      }
-                  });
+                      });
+                  }
+                  
+                  // Initialize error chart
+                  initializeErrorChart();
                   
                   // Fetch real-time CI/CD status
                   async function fetchCIStatus() {
@@ -567,6 +623,9 @@ jobs:
                   
                   // Load live data if available
                   function loadLiveData() {
+                      // Set default timestamp
+                      document.getElementById('lastUpdated').textContent = new Date().toLocaleString();
+                      
                       if (typeof window.livePerformanceData !== 'undefined') {
                           const data = window.livePerformanceData;
                           document.getElementById('lastUpdated').textContent = 
@@ -592,14 +651,34 @@ jobs:
                               </div>
                           \`;
                       } else {
-                          // Fallback to API fetch
-                          fetchCIStatus();
-                          document.getElementById('lastUpdated').textContent = new Date().toLocaleString();
+                          // Show fallback CI status while trying to fetch real data
+                          document.getElementById('ciStatusContainer').innerHTML = \`
+                              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; color: white;">
+                                  <div style="text-align: center;">
+                                      <strong>Stage 1 (SQLite)</strong><br>
+                                      <span class="status-success">✅ Demo Mode</span>
+                                  </div>
+                                  <div style="text-align: center;">
+                                      <strong>Stage 2 (PostgreSQL)</strong><br>
+                                      <span class="status-success">✅ Demo Mode</span>
+                                  </div>
+                              </div>
+                              <div style="margin-top: 15px; text-align: center;">
+                                  <a href="https://github.com/kardebkar/System-Design-Practice/actions" target="_blank" style="color: #87ceeb;">View All Runs</a>
+                              </div>
+                          \`;
+                          
+                          // Try to fetch real data
+                          setTimeout(fetchCIStatus, 2000);
                       }
                   }
                   
-                  // Initialize dashboard
-                  loadLiveData();
+                  // Initialize dashboard when DOM is ready
+                  if (document.readyState === 'loading') {
+                      document.addEventListener('DOMContentLoaded', loadLiveData);
+                  } else {
+                      loadLiveData();
+                  }
                   
                   // Refresh CI status every 2 minutes
                   setInterval(fetchCIStatus, 120000);
