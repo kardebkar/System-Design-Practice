@@ -69,9 +69,10 @@ jobs:
           EOF
           
           # Create live performance data with fallback
-          cat > docs/live-performance-data.js << 'EOF'
+          TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+          cat > docs/live-performance-data.js << EOF
           window.livePerformanceData = {
-            lastUpdated: "$(date -u +"%Y-%m-%dT%H:%M:%SZ")",
+            lastUpdated: "${TIMESTAMP}",
             buildNumber: "DEMO",
             commit: "latest",
             branch: "main",
