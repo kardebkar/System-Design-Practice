@@ -450,8 +450,8 @@ app.use((req, res) => {
 // Start server
 async function start() {
   try {
-    /// Connect to Redis only if not already connected
-    if (!redisClient.isOpen) {
+    // Connect to Redis only if not already connected and not in production
+    if (!redisClient.isOpen && process.env.NODE_ENV !== 'production') {
       await redisClient.connect();
     }
     // Test database connection
