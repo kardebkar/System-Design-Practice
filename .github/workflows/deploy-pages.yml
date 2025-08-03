@@ -476,9 +476,21 @@ jobs:
               
               <script src="live-performance-data.js"></script>
               <script>
-                  // Initialize Performance Chart
-                  const ctx = document.getElementById('performanceChart').getContext('2d');
-                  new Chart(ctx, {
+                  // Wait for Chart.js to load and DOM to be ready
+                  function initializeDashboard() {
+                      if (typeof Chart === 'undefined') {
+                          setTimeout(initializeDashboard, 100);
+                          return;
+                      }
+                      
+                      // Initialize Performance Chart
+                      const ctx = document.getElementById('performanceChart');
+                      if (!ctx) {
+                          console.error('Performance chart canvas not found');
+                          return;
+                      }
+                      const performanceChart = ctx.getContext('2d');
+                      new Chart(performanceChart, {
                       type: 'line',
                       data: {
                           labels: ['10 users', '50 users', '100 users', '200 users'],
@@ -535,9 +547,13 @@ jobs:
                       }
                   });
                   
-                  // Initialize Error Distribution Chart with better error handling
-                  function initializeErrorChart() {
-                      const errorCtx = document.getElementById('errorChart').getContext('2d');
+                      // Initialize Error Distribution Chart with better error handling
+                      const errorCanvas = document.getElementById('errorChart');
+                      if (!errorCanvas) {
+                          console.error('Error chart canvas not found');
+                          return;
+                      }
+                      const errorCtx = errorCanvas.getContext('2d');
                       new Chart(errorCtx, {
                           type: 'doughnut',
                           data: {
@@ -572,8 +588,9 @@ jobs:
                       });
                   }
                   
-                  // Initialize error chart
-                  initializeErrorChart();
+                      // Load live data and initialize CI status
+                      loadLiveData();
+                  }
                   
                   // Fetch real-time CI/CD status
                   async function fetchCIStatus() {
@@ -676,9 +693,9 @@ jobs:
                   
                   // Initialize dashboard when DOM is ready
                   if (document.readyState === 'loading') {
-                      document.addEventListener('DOMContentLoaded', loadLiveData);
+                      document.addEventListener('DOMContentLoaded', initializeDashboard);
                   } else {
-                      loadLiveData();
+                      initializeDashboard();
                   }
                   
                   // Refresh CI status every 2 minutes

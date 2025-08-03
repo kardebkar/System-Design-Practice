@@ -51,7 +51,57 @@ window.livePerformanceData = {
 
 ---
 
-## Issue #2: [Future issues will be documented here]
+## Issue #2: Charts Still Not Loading Despite Fixed Timestamps
+
+### **Problem Description**
+Even after fixing the timestamp generation, the dashboard charts (Response Time Trend and Error Distribution) remained blank, and the CI/CD status continued showing "Loading...".
+
+### **Root Cause Analysis**
+The JavaScript was executing before:
+1. **Chart.js library fully loaded** from the CDN
+2. **DOM elements were ready** for chart initialization
+3. **Proper error handling** for missing canvas elements
+
+**Symptoms:**
+- `TypeError: Chart is not a constructor` (Chart.js not loaded)
+- `Cannot read property 'getContext' of null` (DOM not ready)
+- Silent failures with no error logging
+
+### **Solution Applied**
+1. **Added Chart.js loading check** with retry mechanism
+2. **Wrapped all initialization** in a single function with proper sequencing
+3. **Added DOM element validation** before chart creation
+4. **Improved error logging** for debugging
+
+```javascript
+// BEFORE - Race condition issues:
+const ctx = document.getElementById('performanceChart').getContext('2d');
+new Chart(ctx, {...});
+
+// AFTER - Proper loading sequence:
+function initializeDashboard() {
+    if (typeof Chart === 'undefined') {
+        setTimeout(initializeDashboard, 100);  // Retry until Chart.js loads
+        return;
+    }
+    
+    const ctx = document.getElementById('performanceChart');
+    if (!ctx) {
+        console.error('Performance chart canvas not found');
+        return;
+    }
+    // ... safe to proceed
+}
+```
+
+### **Files Modified**
+- `.github/workflows/deploy-pages.yml` - Lines 479-699 (JavaScript initialization)
+
+### **Key Learning**
+- **External CDN libraries** may load after your script executes
+- **Always validate DOM elements** exist before using them
+- **Use retry mechanisms** for external dependencies
+- **Wrap related initialization** in a single function for better control
 
 ---
 
