@@ -1,4 +1,41 @@
-# Chapter 1: Scale from Zero to Millions - Stage 1
+# 🚀 System Design Practice: Scale from Zero to Millions
+
+## 📊 Interactive Performance Dashboard
+**[🎯 VIEW LIVE DASHBOARD](./performance-dashboard.html)** - Complete performance comparison with interview insights
+
+```bash
+# Quick access to dashboard
+./view-dashboard.sh
+```
+
+---
+
+## 🏗️ Complete Project Structure
+
+```
+System-Design-Practice/
+├── 📊 performance-dashboard.html    # Interactive performance dashboard
+├── 🔧 view-dashboard.sh            # Quick dashboard access script
+├── 📋 README.md                    # This file
+└── chapter-1-minigram/
+    ├── stage-1/                    # SQLite implementation
+    │   ├── 📊 Performance: 5 users max, 35% error rate
+    │   └── 🎯 Interview Gold: Breaking point analysis
+    └── stage-2/                    # PostgreSQL implementation  
+        ├── 📊 Performance: 200+ users, <1% error rate
+        ├── 🚀 46% faster response times
+        └── 🎯 Interview Gold: Scaling architecture decisions
+```
+
+## 🎯 Stage Comparison Overview
+
+| Aspect | Stage 1 (SQLite) | Stage 2 (PostgreSQL) | Improvement |
+|--------|------------------|----------------------|-------------|
+| **Max Users** | 5 concurrent | 200+ concurrent | **40x increase** |
+| **Response Time** | 2.8s @ 50 users | 1.5s @ 200 users | **46% faster** |
+| **Error Rate** | 35.71% under load | <1% under load | **35x better** |
+| **User Experience** | 40.5/100 @ 50 users | 79.8/100 @ 200 users | **2x better** |
+| **Architecture** | Single process | Connection pooling + Redis | **Production ready** |
 
 ## 🎯 Stage 1: Single Server Architecture
 
