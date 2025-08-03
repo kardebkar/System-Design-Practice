@@ -492,13 +492,11 @@ jobs:
                       // Add visible debug info to page
                       const debugDiv = document.createElement('div');
                       debugDiv.style.cssText = 'position: fixed; top: 10px; right: 10px; background: rgba(0,0,0,0.8); color: white; padding: 10px; border-radius: 5px; font-size: 12px; z-index: 9999;';
-                      debugDiv.innerHTML = \`
-                          <strong>Debug Info:</strong><br>
-                          Chart.js: \${typeof Chart !== 'undefined' ? '✅' : '❌'}<br>
-                          Live Data: \${typeof window.livePerformanceData !== 'undefined' ? '✅' : '❌'}<br>
-                          Performance Canvas: \${document.getElementById('performanceChart') ? '✅' : '❌'}<br>
-                          Error Canvas: \${document.getElementById('errorChart') ? '✅' : '❌'}
-                      \`;
+                      debugDiv.innerHTML = '<strong>Debug Info:</strong><br>' +
+                          'Chart.js: ' + (typeof Chart !== 'undefined' ? '✅' : '❌') + '<br>' +
+                          'Live Data: ' + (typeof window.livePerformanceData !== 'undefined' ? '✅' : '❌') + '<br>' +
+                          'Performance Canvas: ' + (document.getElementById('performanceChart') ? '✅' : '❌') + '<br>' +
+                          'Error Canvas: ' + (document.getElementById('errorChart') ? '✅' : '❌');
                       document.body.appendChild(debugDiv);
                   }
                   
