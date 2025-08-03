@@ -476,12 +476,44 @@ jobs:
               
               <script src="live-performance-data.js"></script>
               <script>
+                  // Debug function to show loading status
+                  function showDebugInfo() {
+                      console.log('=== DASHBOARD DEBUG INFO ===');
+                      console.log('Chart.js loaded:', typeof Chart !== 'undefined');
+                      console.log('Live data loaded:', typeof window.livePerformanceData !== 'undefined');
+                      console.log('Performance canvas exists:', document.getElementById('performanceChart') !== null);
+                      console.log('Error canvas exists:', document.getElementById('errorChart') !== null);
+                      
+                      if (typeof window.livePerformanceData !== 'undefined') {
+                          console.log('Live data timestamp:', window.livePerformanceData.lastUpdated);
+                          console.log('Live data metrics:', window.livePerformanceData.metrics);
+                      }
+                      
+                      // Add visible debug info to page
+                      const debugDiv = document.createElement('div');
+                      debugDiv.style.cssText = 'position: fixed; top: 10px; right: 10px; background: rgba(0,0,0,0.8); color: white; padding: 10px; border-radius: 5px; font-size: 12px; z-index: 9999;';
+                      debugDiv.innerHTML = \`
+                          <strong>Debug Info:</strong><br>
+                          Chart.js: \${typeof Chart !== 'undefined' ? '✅' : '❌'}<br>
+                          Live Data: \${typeof window.livePerformanceData !== 'undefined' ? '✅' : '❌'}<br>
+                          Performance Canvas: \${document.getElementById('performanceChart') ? '✅' : '❌'}<br>
+                          Error Canvas: \${document.getElementById('errorChart') ? '✅' : '❌'}
+                      \`;
+                      document.body.appendChild(debugDiv);
+                  }
+                  
                   // Wait for Chart.js to load and DOM to be ready
                   function initializeDashboard() {
+                      console.log('initializeDashboard called');
+                      showDebugInfo();
+                      
                       if (typeof Chart === 'undefined') {
+                          console.log('Chart.js not loaded yet, retrying in 100ms');
                           setTimeout(initializeDashboard, 100);
                           return;
                       }
+                      
+                      console.log('Chart.js is loaded, proceeding with initialization');
                       
                       // Initialize Performance Chart with live data
                       const ctx = document.getElementById('performanceChart');
@@ -519,7 +551,8 @@ jobs:
                       }
                       
                       const performanceChart = ctx.getContext('2d');
-                      new Chart(performanceChart, {
+                      console.log('Creating performance chart with data:', stage1Data, stage2Data);
+                      const chart1 = new Chart(performanceChart, {
                           type: 'line',
                           data: {
                               labels: ['10 users', '50 users', '100 users', '200 users'],
@@ -609,7 +642,8 @@ jobs:
                       }
                       
                       const errorCtx = errorCanvas.getContext('2d');
-                      new Chart(errorCtx, {
+                      console.log('Creating error chart with data:', errorData);
+                      const chart2 = new Chart(errorCtx, {
                           type: 'doughnut',
                           data: {
                               labels: ['Successful Requests', 'Timeout Errors', 'Server Errors', 'Connection Errors'],
