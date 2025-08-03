@@ -251,12 +251,54 @@ jobs:
                       background: rgba(255,255,255,0.3);
                   }
                   
+                  .share-buttons {
+                      display: flex;
+                      justify-content: center;
+                      gap: 15px;
+                      margin: 30px 0;
+                      flex-wrap: wrap;
+                  }
+                  
+                  .share-btn {
+                      background: rgba(255,255,255,0.2);
+                      color: white;
+                      text-decoration: none;
+                      padding: 12px 24px;
+                      border-radius: 25px;
+                      font-weight: 600;
+                      transition: all 0.3s ease;
+                      display: flex;
+                      align-items: center;
+                      gap: 8px;
+                  }
+                  
+                  .share-btn:hover {
+                      background: rgba(255,255,255,0.3);
+                      transform: translateY(-2px);
+                  }
+                  
+                  .ci-status {
+                      background: rgba(255,255,255,0.1);
+                      border-radius: 15px;
+                      padding: 20px;
+                      margin: 20px 0;
+                      backdrop-filter: blur(10px);
+                  }
+                  
+                  .status-success { color: #28a745; }
+                  .status-failure { color: #dc3545; }
+                  .status-pending { color: #ffc107; }
+                  
                   @media (max-width: 768px) {
                       .header h1 {
                           font-size: 2em;
                       }
                       .cards-grid {
                           grid-template-columns: 1fr;
+                      }
+                      .share-buttons {
+                          flex-direction: column;
+                          align-items: center;
                       }
                   }
               </style>
@@ -357,6 +399,33 @@ jobs:
                       <canvas id="performanceChart" style="max-height: 400px;"></canvas>
                   </div>
                   
+                  <div class="ci-status">
+                      <h2 style="color: white; margin-bottom: 15px; text-align: center;">🔄 Live CI/CD Status</h2>
+                      <div id="ciStatusContainer">
+                          <div style="text-align: center; padding: 20px;">🔄 Loading latest CI/CD status...</div>
+                      </div>
+                  </div>
+                  
+                  <div class="chart-container">
+                      <h2 style="color: #667eea; margin-bottom: 20px;">📊 Error Distribution</h2>
+                      <canvas id="errorChart" style="max-height: 300px;"></canvas>
+                  </div>
+                  
+                  <div class="share-buttons">
+                      <a href="https://twitter.com/intent/tweet?text=Achieved%2046%25%20performance%20improvement%20migrating%20from%20SQLite%20to%20PostgreSQL!%20Check%20out%20the%20dashboard%3A&url=https://kardebkar.github.io/System-Design-Practice/" 
+                         target="_blank" class="share-btn twitter">
+                          🐦 Share on Twitter
+                      </a>
+                      <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://kardebkar.github.io/System-Design-Practice/" 
+                         target="_blank" class="share-btn linkedin">
+                          💼 Share on LinkedIn
+                      </a>
+                      <a href="https://github.com/kardebkar/System-Design-Practice" 
+                         target="_blank" class="share-btn github">
+                          ⭐ Star on GitHub
+                      </a>
+                  </div>
+                  
                   <div class="footer">
                       <p style="margin-bottom: 20px;">Last Updated: <span id="lastUpdated"></span></p>
                       <a href="https://github.com/kardebkar/System-Design-Practice">📚 View Repository</a>
@@ -365,8 +434,9 @@ jobs:
                   </div>
               </div>
               
+              <script src="live-performance-data.js"></script>
               <script>
-                  // Initialize Chart
+                  // Initialize Performance Chart
                   const ctx = document.getElementById('performanceChart').getContext('2d');
                   new Chart(ctx, {
                       type: 'line',
@@ -425,8 +495,114 @@ jobs:
                       }
                   });
                   
-                  // Update last updated time
-                  document.getElementById('lastUpdated').textContent = new Date().toLocaleString();
+                  // Initialize Error Distribution Chart
+                  const errorCtx = document.getElementById('errorChart').getContext('2d');
+                  new Chart(errorCtx, {
+                      type: 'doughnut',
+                      data: {
+                          labels: ['Successful Requests', 'Timeout Errors', 'Server Errors', 'Connection Errors'],
+                          datasets: [{
+                              data: [65, 20, 10, 5],
+                              backgroundColor: ['#28a745', '#ffc107', '#dc3545', '#6c757d'],
+                              borderWidth: 0
+                          }]
+                      },
+                      options: {
+                          responsive: true,
+                          maintainAspectRatio: false,
+                          plugins: {
+                              legend: {
+                                  position: 'bottom',
+                              }
+                          }
+                      }
+                  });
+                  
+                  // Fetch real-time CI/CD status
+                  async function fetchCIStatus() {
+                      try {
+                          const response = await fetch('https://api.github.com/repos/kardebkar/System-Design-Practice/actions/runs?per_page=5');
+                          const data = await response.json();
+                          const latestRun = data.workflow_runs[0];
+                          
+                          if (latestRun) {
+                              const status = latestRun.conclusion || latestRun.status;
+                              const statusIcon = status === 'success' ? '✅' : status === 'failure' ? '❌' : '🔄';
+                              const statusClass = status === 'success' ? 'status-success' : status === 'failure' ? 'status-failure' : 'status-pending';
+                              
+                              document.getElementById('ciStatusContainer').innerHTML = \`
+                                  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; color: white;">
+                                      <div>
+                                          <strong>Status:</strong><br>
+                                          <span class="\${statusClass}">\${statusIcon} \${status}</span>
+                                      </div>
+                                      <div>
+                                          <strong>Run #:</strong><br>
+                                          <a href="\${latestRun.html_url}" target="_blank" style="color: #87ceeb;">#\${latestRun.run_number}</a>
+                                      </div>
+                                      <div>
+                                          <strong>Triggered by:</strong><br>
+                                          \${latestRun.actor.login}
+                                      </div>
+                                      <div>
+                                          <strong>Started:</strong><br>
+                                          \${new Date(latestRun.created_at).toLocaleString()}
+                                      </div>
+                                  </div>
+                                  <div style="margin-top: 15px; text-align: center;">
+                                      <a href="\${latestRun.html_url}" target="_blank" style="color: #87ceeb; margin: 0 10px;">View Details</a>
+                                      <a href="https://github.com/kardebkar/System-Design-Practice/actions" target="_blank" style="color: #87ceeb; margin: 0 10px;">All Runs</a>
+                                  </div>
+                              \`;
+                          }
+                      } catch (error) {
+                          document.getElementById('ciStatusContainer').innerHTML = \`
+                              <div style="text-align: center; color: #ffc107;">
+                                  ⚠️ Could not fetch CI/CD status<br>
+                                  <small>API rate limit or network issue</small>
+                              </div>
+                          \`;
+                      }
+                  }
+                  
+                  // Load live data if available
+                  function loadLiveData() {
+                      if (typeof window.livePerformanceData !== 'undefined') {
+                          const data = window.livePerformanceData;
+                          document.getElementById('lastUpdated').textContent = 
+                              new Date(data.lastUpdated).toLocaleString() + \` (Build #\${data.buildNumber})\`;
+                          
+                          // Update CI status from live data
+                          const stage1Status = data.ciStatus.stage1 === 'success' ? '✅ Passed' : '❌ Failed';
+                          const stage2Status = data.ciStatus.stage2 === 'success' ? '✅ Passed' : '❌ Failed';
+                          
+                          document.getElementById('ciStatusContainer').innerHTML = \`
+                              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; color: white;">
+                                  <div style="text-align: center;">
+                                      <strong>Stage 1 (SQLite)</strong><br>
+                                      <span class="\${data.ciStatus.stage1 === 'success' ? 'status-success' : 'status-failure'}">\${stage1Status}</span>
+                                  </div>
+                                  <div style="text-align: center;">
+                                      <strong>Stage 2 (PostgreSQL)</strong><br>
+                                      <span class="\${data.ciStatus.stage2 === 'success' ? 'status-success' : 'status-failure'}">\${stage2Status}</span>
+                                  </div>
+                              </div>
+                              <div style="margin-top: 15px; text-align: center;">
+                                  <a href="\${data.runUrl}" target="_blank" style="color: #87ceeb;">View Latest Run</a>
+                              </div>
+                          \`;
+                      } else {
+                          // Fallback to API fetch
+                          fetchCIStatus();
+                          document.getElementById('lastUpdated').textContent = new Date().toLocaleString();
+                      }
+                  }
+                  
+                  // Initialize dashboard
+                  loadLiveData();
+                  
+                  // Refresh CI status every 2 minutes
+                  setInterval(fetchCIStatus, 120000);
               </script>
           </body>
           </html>
