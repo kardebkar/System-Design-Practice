@@ -272,9 +272,9 @@ jobs:
         echo "🚀 Starting Stage 3 Load Balancer setup..."
         
         # Build and start all services
-        docker-compose up -d --build || {
+        docker compose up -d --build || {
           echo "Failed to start services, checking logs..."
-          docker-compose logs
+          docker compose logs
           exit 1
         }
         
@@ -284,7 +284,7 @@ jobs:
         
         # Check service status
         echo "📊 Service Status:"
-        docker-compose ps || echo "Could not get service status"
+        docker compose ps || echo "Could not get service status"
         
         # Wait for load balancer to be ready with more attempts
         echo "🔍 Waiting for load balancer..."
@@ -301,8 +301,8 @@ jobs:
         
         if [ "$READY" = false ]; then
           echo "⚠️ Load balancer not ready, checking logs..."
-          docker-compose logs nginx || echo "Could not get nginx logs"
-          docker-compose logs app1 || echo "Could not get app1 logs"
+          docker compose logs nginx || echo "Could not get nginx logs"
+          docker compose logs app1 || echo "Could not get app1 logs"
         fi
     
     - name: Run load balancing tests
@@ -387,7 +387,7 @@ jobs:
       if: always() && steps.check_stage3.outputs.exists == 'true'
       run: |
         echo "🛑 Stopping Stage 3 services..."
-        docker-compose down || echo "docker-compose down failed"
+        docker compose down || echo "docker compose down failed"
         docker system prune -f || echo "docker system prune failed"
     
     - name: Upload Stage 3 test results
