@@ -1,0 +1,277 @@
+services:
+  # NGINX Load Balancer
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+      - "8080:8080"  # Admin/stats port
+    volumes:
+      - ./config/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - app1
+      - app2
+      - app3
+    restart: unless-stopped
+    networks:
+      - minigram-network
+
+  # Application Servers (Horizontally Scalable)
+  app1:
+    build: 
+      context: ./app
+      dockerfile: Dockerfile
+    environment:
+      - NODE_ENV=production
+      - INSTANCE_ID=app1
+      - DB_HOST=postgres-master
+      - DB_READ_HOST=postgres-read1
+      - REDIS_HOST=redis
+      - PORT=3000
+      - METRICS_PORT=9090
+    volumes:
+      - ./uploads:/app/uploads
+    depends_on:
+      - postgres-master
+      - postgres-read1
+      - redis
+    restart: unless-stopped
+    networks:
+      - minigram-network
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 256M
+
+  app2:
+    build: 
+      context: ./app
+      dockerfile: Dockerfile
+    environment:
+      - NODE_ENV=production
+      - INSTANCE_ID=app2
+      - DB_HOST=postgres-master
+      - DB_READ_HOST=postgres-read2
+      - REDIS_HOST=redis
+      - PORT=3000
+      - METRICS_PORT=9091
+    volumes:
+      - ./uploads:/app/uploads
+    depends_on:
+      - postgres-master
+      - postgres-read2
+      - redis
+    restart: unless-stopped
+    networks:
+      - minigram-network
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 256M
+
+  app3:
+    build: 
+      context: ./app
+      dockerfile: Dockerfile
+    environment:
+      - NODE_ENV=production
+      - INSTANCE_ID=app3
+      - DB_HOST=postgres-master
+      - DB_READ_HOST=postgres-read1
+      - REDIS_HOST=redis
+      - PORT=3000
+      - METRICS_PORT=9092
+    volumes:
+      - ./uploads:/app/uploads
+    depends_on:
+      - postgres-master
+      - postgres-read1
+      - redis
+    restart: unless-stopped
+    networks:
+      - minigram-network
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 256M
+
+  # PostgreSQL Master (Write Operations)
+  postgres-master:
+    image: postgres:15-alpine
+    environment:
+      - POSTGRES_DB=minigram
+      - POSTGRES_USER=minigram_user
+      - POSTGRES_PASSWORD=minigram_pass
+      - POSTGRES_REPLICATION_MODE=master
+      - POSTGRES_REPLICATION_USER=replicator
+      - POSTGRES_REPLICATION_PASSWORD=replicator_pass
+      - POSTGRES_MAX_CONNECTIONS=200
+      - POSTGRES_SHARED_BUFFERS=256MB
+      - POSTGRES_EFFECTIVE_CACHE_SIZE=1GB
+    volumes:
+      - postgres_master_data:/var/lib/postgresql/data
+      - ./config/postgresql.conf:/etc/postgresql/postgresql.conf:ro
+      - ./config/init-replication.sql:/docker-entrypoint-initdb.d/init-replication.sql:ro
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
+    networks:
+      - minigram-network
+    command: >
+      postgres
+      -c listen_addresses='*'
+      -c max_connections=200
+      -c shared_buffers=256MB
+      -c effective_cache_size=1GB
+      -c maintenance_work_mem=64MB
+      -c checkpoint_completion_target=0.9
+      -c wal_buffers=16MB
+      -c default_statistics_target=100
+      -c random_page_cost=1.1
+      -c effective_io_concurrency=200
+
+  # PostgreSQL Read Replica 1
+  postgres-read1:
+    image: postgres:15-alpine
+    environment:
+      - POSTGRES_DB=minigram
+      - POSTGRES_USER=minigram_user
+      - POSTGRES_PASSWORD=minigram_pass
+      - POSTGRES_MASTER_SERVICE=postgres-master
+      - POSTGRES_REPLICATION_MODE=slave
+      - POSTGRES_REPLICATION_USER=replicator
+      - POSTGRES_REPLICATION_PASSWORD=replicator_pass
+    volumes:
+      - postgres_read1_data:/var/lib/postgresql/data
+    depends_on:
+      - postgres-master
+    restart: unless-stopped
+    networks:
+      - minigram-network
+    command: >
+      postgres
+      -c listen_addresses='*'
+      -c max_connections=100
+      -c shared_buffers=128MB
+      -c effective_cache_size=512MB
+
+  # PostgreSQL Read Replica 2
+  postgres-read2:
+    image: postgres:15-alpine
+    environment:
+      - POSTGRES_DB=minigram
+      - POSTGRES_USER=minigram_user
+      - POSTGRES_PASSWORD=minigram_pass
+      - POSTGRES_MASTER_SERVICE=postgres-master
+      - POSTGRES_REPLICATION_MODE=slave
+      - POSTGRES_REPLICATION_USER=replicator
+      - POSTGRES_REPLICATION_PASSWORD=replicator_pass
+    volumes:
+      - postgres_read2_data:/var/lib/postgresql/data
+    depends_on:
+      - postgres-master
+    restart: unless-stopped
+    networks:
+      - minigram-network
+    command: >
+      postgres
+      -c listen_addresses='*'
+      -c max_connections=100
+      -c shared_buffers=128MB
+      -c effective_cache_size=512MB
+
+  # Redis Cache & Session Store
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+      - ./config/redis.conf:/usr/local/etc/redis/redis.conf:ro
+    restart: unless-stopped
+    networks:
+      - minigram-network
+    command: redis-server /usr/local/etc/redis/redis.conf
+    sysctls:
+      net.core.somaxconn: 1024
+
+  # Prometheus (Metrics Collection)
+  prometheus:
+    image: prom/prometheus:latest
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--storage.tsdb.retention.time=200h'
+      - '--web.enable-lifecycle'
+    restart: unless-stopped
+    networks:
+      - minigram-network
+
+  # Grafana (Metrics Visualization)
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3001:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin123
+      - GF_SERVER_ROOT_URL=http://localhost:3001
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./monitoring/grafana-datasources.yml:/etc/grafana/provisioning/datasources/datasources.yml:ro
+      - ./monitoring/grafana-dashboards.yml:/etc/grafana/provisioning/dashboards/dashboards.yml:ro
+      - ./monitoring/dashboards:/var/lib/grafana/dashboards:ro
+    depends_on:
+      - prometheus
+    restart: unless-stopped
+    networks:
+      - minigram-network
+
+  # Node Exporter (System Metrics)
+  node-exporter:
+    image: prom/node-exporter:latest
+    ports:
+      - "9100:9100"
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    command:
+      - '--path.procfs=/host/proc'
+      - '--path.sysfs=/host/sys'
+      - '--collector.filesystem.ignored-mount-points=^/(sys|proc|dev|host|etc)($$|/)'
+    restart: unless-stopped
+    networks:
+      - minigram-network
+
+volumes:
+  postgres_master_data:
+  postgres_read1_data:
+  postgres_read2_data:
+  redis_data:
+  prometheus_data:
+  grafana_data:
+
+networks:
+  minigram-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16

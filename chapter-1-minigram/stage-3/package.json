@@ -1,0 +1,53 @@
+{
+  "name": "minigram-stage3-root",
+  "version": "3.0.0",
+  "description": "MiniGram Stage 3 - Load Balancer, CDN & Horizontal Scaling - Root Project",
+  "main": "index.js",
+  "scripts": {
+    "start": "docker-compose up -d",
+    "stop": "docker-compose down",
+    "build": "docker-compose up -d --build",
+    "scale": "docker-compose up -d --scale app1=2 --scale app2=2 --scale app3=1",
+    "logs": "docker-compose logs -f",
+    "status": "docker-compose ps",
+    "test:load": "node tests/load-balanced-test.js",
+    "test:scaling": "node tests/horizontal-scaling-test.js",
+    "test:stress": "node tests/ultimate-stress-test.js",
+    "test:all": "npm run test:load && npm run test:scaling && npm run test:stress",
+    "health": "curl -s http://localhost/health | jq .",
+    "metrics": "curl -s http://localhost/api/instance | jq .",
+    "monitor": "echo 'Opening monitoring dashboards...' && open http://localhost:3001 && open http://localhost:9090",
+    "clean": "docker-compose down -v && docker system prune -f"
+  },
+  "devDependencies": {
+    "artillery": "^2.0.0",
+    "jest": "^29.5.0",
+    "supertest": "^6.3.3"
+  },
+  "dependencies": {
+    "node-fetch": "^2.6.12"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "docker": ">=20.0.0",
+    "docker-compose": ">=2.0.0"
+  },
+  "keywords": [
+    "load-balancer",
+    "horizontal-scaling",
+    "microservices",
+    "docker",
+    "nginx",
+    "postgresql",
+    "redis",
+    "prometheus",
+    "grafana",
+    "system-design"
+  ],
+  "author": "System Design Practice",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kardebkar/System-Design-Practice"
+  }
+}
