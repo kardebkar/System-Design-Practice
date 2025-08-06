@@ -4,10 +4,10 @@ window.livePerformanceData = {
   commit: "dda69815b77e57757604f155484c8dbafa781155",
   branch: "main",
   ciStatus: {
-    stage1: "",
-    stage2: "",
-    stage3: "",
-    stage4: ""
+    stage1: "success",
+    stage2: "success", 
+    stage3: "success",
+    stage4: "success"
   },
   metrics: {
     stage1: {
@@ -47,7 +47,7 @@ window.livePerformanceData = {
     },
     stage4: {
       name: "Cache + CDN", 
-      successRate: 85,
+      successRate: 98,
       metrics: {
         "10": { "response": 8, "ux": 100, "errors": 0 },
         "50": { "response": 9, "ux": 100, "errors": 0 },
