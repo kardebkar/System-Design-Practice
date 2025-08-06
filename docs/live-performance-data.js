@@ -1,11 +1,11 @@
 window.livePerformanceData = {
-  lastUpdated: "2025-08-06T04:20:00Z",
-  buildNumber: "31",
-  commit: "stage4-cache-cdn-implementation",
+  lastUpdated: "2025-08-06T04:25:00Z",
+  buildNumber: "32",
+  commit: "stage4-cache-cdn-final-deployment",
   branch: "main",
   ciStatus: {
     stage1: "success",
-    stage2: "success",
+    stage2: "success", 
     stage3: "success",
     stage4: "success"
   },
@@ -82,5 +82,5 @@ window.livePerformanceData = {
   },
   improvement: "1000x from Stage 1, 62x from Stage 2, 2.5x from Stage 3",
   breakingPoint: 5000,
-  runUrl: "https://github.com/kardebkar/System-Design-Practice/actions/runs/16739140249"
+  runUrl: "https://github.com/kardebkar/System-Design-Practice/actions/runs/16766703508"
 };
