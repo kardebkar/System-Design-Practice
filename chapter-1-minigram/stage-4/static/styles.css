@@ -1,0 +1,267 @@
+/* MiniGram Stage 4 - Cache & CDN Styles */
+/* This CSS will be served through CDN for caching demonstration */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    line-height: 1.6;
+    color: #333;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    padding: 20px;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+header {
+    background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+    color: white;
+    padding: 40px;
+    text-align: center;
+}
+
+header h1 {
+    font-size: 3rem;
+    margin-bottom: 10px;
+    font-weight: 700;
+}
+
+.subtitle {
+    font-size: 1.3rem;
+    opacity: 0.9;
+    font-weight: 300;
+}
+
+.architecture-info, .instance-info, .api-endpoints, .performance-test {
+    padding: 30px 40px;
+    border-bottom: 1px solid #eee;
+}
+
+.architecture-info:last-child, 
+.instance-info:last-child, 
+.api-endpoints:last-child, 
+.performance-test:last-child {
+    border-bottom: none;
+}
+
+h2, h3 {
+    color: #2c3e50;
+    margin-bottom: 20px;
+    font-weight: 600;
+}
+
+h2 {
+    font-size: 1.8rem;
+}
+
+h3 {
+    font-size: 1.4rem;
+}
+
+ul {
+    list-style: none;
+}
+
+.architecture-info ul li {
+    padding: 8px 0;
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+}
+
+.architecture-info ul li::before {
+    content: '';
+    width: 8px;
+    height: 8px;
+    background: #27ae60;
+    border-radius: 50%;
+    margin-right: 15px;
+    display: inline-block;
+}
+
+.instance-info p {
+    margin: 10px 0;
+    font-size: 1.1rem;
+}
+
+.instance-info span {
+    font-weight: 600;
+    color: #e74c3c;
+    background: #f8f9fa;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+}
+
+.api-endpoints ul li {
+    margin: 12px 0;
+}
+
+.api-endpoints a {
+    color: #3498db;
+    text-decoration: none;
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    background: #f8f9fa;
+    padding: 8px 12px;
+    border-radius: 6px;
+    border: 1px solid #e9ecef;
+    display: inline-block;
+    transition: all 0.3s ease;
+}
+
+.api-endpoints a:hover {
+    background: #3498db;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+}
+
+button {
+    background: linear-gradient(45deg, #00b894, #00cec9);
+    color: white;
+    border: none;
+    padding: 15px 30px;
+    font-size: 1.1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 600;
+}
+
+button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 184, 148, 0.3);
+}
+
+button:active {
+    transform: translateY(0);
+}
+
+#test-results {
+    margin-top: 20px;
+    padding: 20px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border-left: 4px solid #00b894;
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    font-size: 0.9rem;
+    line-height: 1.8;
+    display: none;
+}
+
+#test-results.show {
+    display: block;
+    animation: fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.loading {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid #f3f3f3;
+    border-top: 3px solid #3498db;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.cache-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.cache-indicator {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #27ae60;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+.error {
+    color: #e74c3c;
+    background: #fadbd8;
+    border-color: #f1948a;
+}
+
+.success {
+    color: #27ae60;
+    background: #d5f4e6;
+    border-color: #82e3aa;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    body {
+        padding: 10px;
+    }
+    
+    .container {
+        border-radius: 10px;
+    }
+    
+    header {
+        padding: 30px 20px;
+    }
+    
+    header h1 {
+        font-size: 2.2rem;
+    }
+    
+    .subtitle {
+        font-size: 1.1rem;
+    }
+    
+    .architecture-info, .instance-info, .api-endpoints, .performance-test {
+        padding: 20px;
+    }
+    
+    .api-endpoints a {
+        display: block;
+        margin: 8px 0;
+        text-align: center;
+    }
+}
+
+/* Print styles */
+@media print {
+    body {
+        background: white;
+        color: black;
+    }
+    
+    .container {
+        box-shadow: none;
+    }
+    
+    button {
+        display: none;
+    }
+}

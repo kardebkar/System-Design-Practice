@@ -1,0 +1,317 @@
+services:
+  # NGINX Load Balancer (from Stage 3)
+  nginx:
+    image: nginx:alpine
+    container_name: minigram_lb
+    ports:
+      - "80:80"
+      - "8080:8080"  # NGINX status page
+    volumes:
+      - ./config/nginx.conf:/etc/nginx/nginx.conf
+      - ./static:/usr/share/nginx/html/static
+    depends_on:
+      - app1
+      - app2
+      - app3
+      - cdn
+    networks:
+      - minigram_network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # CDN Simulation Server
+  cdn:
+    image: nginx:alpine
+    container_name: minigram_cdn
+    ports:
+      - "8081:80"
+    volumes:
+      - ./static:/usr/share/nginx/html
+      - ./config/cdn-nginx.conf:/etc/nginx/nginx.conf
+    networks:
+      - minigram_network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Application Servers with Cache Layer
+  app1:
+    build:
+      context: ./app
+      dockerfile: Dockerfile
+    container_name: minigram_app1
+    environment:
+      - NODE_ENV=production
+      - INSTANCE_ID=app1
+      - DB_HOST=postgres-master
+      - DB_PORT=5432
+      - DB_NAME=minigram
+      - DB_USER=minigram_user
+      - DB_PASS=minigram_pass
+      - REDIS_HOST=redis-cache
+      - REDIS_PORT=6379
+      - CDN_URL=http://cdn:80
+      - CACHE_TTL=300
+      - PORT=3000
+    volumes:
+      - ./uploads:/app/uploads
+    depends_on:
+      - postgres-master
+      - redis-cache
+    networks:
+      - minigram_network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  app2:
+    build:
+      context: ./app
+      dockerfile: Dockerfile
+    container_name: minigram_app2
+    environment:
+      - NODE_ENV=production
+      - INSTANCE_ID=app2
+      - DB_HOST=postgres-master
+      - DB_PORT=5432
+      - DB_NAME=minigram
+      - DB_USER=minigram_user
+      - DB_PASS=minigram_pass
+      - REDIS_HOST=redis-cache
+      - REDIS_PORT=6379
+      - CDN_URL=http://cdn:80
+      - CACHE_TTL=300
+      - PORT=3000
+    volumes:
+      - ./uploads:/app/uploads
+    depends_on:
+      - postgres-master
+      - redis-cache
+    networks:
+      - minigram_network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  app3:
+    build:
+      context: ./app
+      dockerfile: Dockerfile
+    container_name: minigram_app3
+    environment:
+      - NODE_ENV=production
+      - INSTANCE_ID=app3
+      - DB_HOST=postgres-master
+      - DB_PORT=5432
+      - DB_NAME=minigram
+      - DB_USER=minigram_user
+      - DB_PASS=minigram_pass
+      - REDIS_HOST=redis-cache
+      - REDIS_PORT=6379
+      - CDN_URL=http://cdn:80
+      - CACHE_TTL=300
+      - PORT=3000
+    volumes:
+      - ./uploads:/app/uploads
+    depends_on:
+      - postgres-master
+      - redis-cache
+    networks:
+      - minigram_network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Redis Cache Layer (dedicated for application caching)
+  redis-cache:
+    image: redis:7-alpine
+    container_name: minigram_cache
+    ports:
+      - "6380:6379"
+    volumes:
+      - ./config/redis-cache.conf:/usr/local/etc/redis/redis.conf
+      - redis_cache_data:/data
+    command: redis-server /usr/local/etc/redis/redis.conf
+    networks:
+      - minigram_network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Redis Session Store (from Stage 3)
+  redis-session:
+    image: redis:7-alpine
+    container_name: minigram_session
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_session_data:/data
+    networks:
+      - minigram_network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # PostgreSQL Master
+  postgres-master:
+    image: postgres:15-alpine
+    container_name: minigram_db_master
+    environment:
+      - POSTGRES_DB=minigram
+      - POSTGRES_USER=minigram_user
+      - POSTGRES_PASSWORD=minigram_pass
+      - POSTGRES_REPLICATION_USER=replicator
+      - POSTGRES_REPLICATION_PASSWORD=replicator_pass
+    volumes:
+      - postgres_master_data:/var/lib/postgresql/data
+      - ./config/postgresql.conf:/etc/postgresql/postgresql.conf
+      - ./config/init-replication.sql:/docker-entrypoint-initdb.d/init-replication.sql
+    ports:
+      - "5432:5432"
+    networks:
+      - minigram_network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "minigram_user", "-d", "minigram"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # PostgreSQL Read Replica 1
+  postgres-replica1:
+    image: postgres:15-alpine
+    container_name: minigram_db_replica1
+    environment:
+      - POSTGRES_DB=minigram
+      - POSTGRES_USER=minigram_user
+      - POSTGRES_PASSWORD=minigram_pass
+      - PGUSER=postgres
+      - POSTGRES_MASTER_HOST=postgres-master
+      - POSTGRES_REPLICATION_USER=replicator
+      - POSTGRES_REPLICATION_PASSWORD=replicator_pass
+    volumes:
+      - postgres_replica1_data:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
+    depends_on:
+      - postgres-master
+    networks:
+      - minigram_network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "minigram_user", "-d", "minigram"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # PostgreSQL Read Replica 2
+  postgres-replica2:
+    image: postgres:15-alpine
+    container_name: minigram_db_replica2
+    environment:
+      - POSTGRES_DB=minigram
+      - POSTGRES_USER=minigram_user
+      - POSTGRES_PASSWORD=minigram_pass
+      - PGUSER=postgres
+      - POSTGRES_MASTER_HOST=postgres-master
+      - POSTGRES_REPLICATION_USER=replicator
+      - POSTGRES_REPLICATION_PASSWORD=replicator_pass
+    volumes:
+      - postgres_replica2_data:/var/lib/postgresql/data
+    ports:
+      - "5434:5432"
+    depends_on:
+      - postgres-master
+    networks:
+      - minigram_network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "minigram_user", "-d", "minigram"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Prometheus Monitoring
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: minigram_prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--web.enable-lifecycle'
+    networks:
+      - minigram_network
+    restart: unless-stopped
+
+  # Grafana Dashboard
+  grafana:
+    image: grafana/grafana:latest
+    container_name: minigram_grafana
+    ports:
+      - "3001:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./monitoring/grafana-datasources.yml:/etc/grafana/provisioning/datasources/datasources.yml
+      - ./monitoring/grafana-dashboards.yml:/etc/grafana/provisioning/dashboards/dashboards.yml
+      - ./monitoring/dashboards:/var/lib/grafana/dashboards
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin123
+      - GF_INSTALL_PLUGINS=redis-datasource
+    networks:
+      - minigram_network
+    restart: unless-stopped
+
+  # Redis Cache Monitor
+  redis-insight:
+    image: redislabs/redisinsight:latest
+    container_name: minigram_redis_insight
+    ports:
+      - "8001:8001"
+    volumes:
+      - redis_insight_data:/db
+    networks:
+      - minigram_network
+    restart: unless-stopped
+
+networks:
+  minigram_network:
+    driver: bridge
+
+volumes:
+  postgres_master_data:
+  postgres_replica1_data:
+  postgres_replica2_data:
+  redis_cache_data:
+  redis_session_data:
+  prometheus_data:
+  grafana_data:
+  redis_insight_data:

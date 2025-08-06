@@ -1,0 +1,120 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    monitor: 'minigram-stage4'
+    environment: 'development' 
+
+rule_files:
+  # - "alert_rules.yml"
+
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+          # - alertmanager:9093
+
+scrape_configs:
+  # Prometheus itself
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+    metrics_path: /metrics
+    scrape_interval: 30s
+
+  # Application servers with cache metrics
+  - job_name: 'minigram-app-servers'
+    static_configs:
+      - targets: ['app1:3000', 'app2:3000', 'app3:3000']
+    metrics_path: /metrics
+    scrape_interval: 15s
+    scrape_timeout: 10s
+    relabel_configs:
+      - source_labels: [__address__]
+        regex: '(.+):3000'
+        target_label: instance
+        replacement: '${1}'
+      - source_labels: [__address__]
+        regex: '(.+):3000'
+        target_label: service
+        replacement: 'minigram-app'
+
+  # NGINX Load Balancer
+  - job_name: 'nginx-lb'
+    static_configs:
+      - targets: ['nginx:8080']
+    metrics_path: /metrics
+    scrape_interval: 30s
+
+  # Redis Cache Layer
+  - job_name: 'redis-cache'
+    static_configs:
+      - targets: ['redis-cache:6379']
+    metrics_path: /metrics
+    scrape_interval: 30s
+
+  # CDN Server
+  - job_name: 'cdn-server'
+    static_configs:
+      - targets: ['cdn:8080']
+    metrics_path: /metrics
+    scrape_interval: 60s
+
+  # Application health checks (high frequency)
+  - job_name: 'minigram-health'
+    static_configs:
+      - targets: ['app1:3000', 'app2:3000', 'app3:3000']
+    metrics_path: /health
+    scrape_interval: 10s
+    scrape_timeout: 5s
+    relabel_configs:
+      - source_labels: [__address__]
+        regex: '(.+):3000'
+        target_label: instance
+        replacement: '${1}'
+
+  # Cache-specific metrics (focused scraping)
+  - job_name: 'cache-metrics'
+    static_configs:
+      - targets: ['app1:3000', 'app2:3000', 'app3:3000']
+    metrics_path: /api/cache/stats
+    scrape_interval: 20s
+    metric_relabel_configs:
+      # Keep only cache-related metrics
+      - source_labels: [__name__]
+        regex: 'cache_.*'
+        action: keep
+      - source_labels: [__name__]
+        regex: 'redis_.*'
+        action: keep
+
+  # Custom cache performance monitoring
+  - job_name: 'cache-performance'
+    static_configs:
+      - targets: ['app1:3000', 'app2:3000', 'app3:3000']
+    metrics_path: /metrics
+    scrape_interval: 15s
+    params:
+      format: ['prometheus']
+    metric_relabel_configs:
+      # Focus on cache hit/miss metrics
+      - source_labels: [__name__]
+        regex: '(cache_hits_total|cache_misses_total|cache_operation_duration_seconds)'
+        action: keep
+      # Add cache hit ratio calculation
+      - source_labels: [cache_type]
+        target_label: cache_layer
+        replacement: '${1}'
+
+  # Database connection pool metrics (if available)
+  - job_name: 'db-pool-metrics'
+    static_configs:
+      - targets: ['app1:3000', 'app2:3000', 'app3:3000']
+    metrics_path: /metrics
+    scrape_interval: 30s
+    metric_relabel_configs:
+      - source_labels: [__name__]
+        regex: '(db_query_duration_seconds|active_connections)'
+        action: keep
+
+# Note: Storage, web, and log configurations are handled via command line flags in docker-compose.yml

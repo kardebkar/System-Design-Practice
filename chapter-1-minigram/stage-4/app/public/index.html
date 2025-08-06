@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MiniGram - Stage 4 (Cache & CDN)</title>
+    <link rel="stylesheet" href="/static/styles.css">
+    <link rel="icon" href="/static/favicon.ico">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🚀 MiniGram - Stage 4</h1>
+            <p class="subtitle">Cache Layer & CDN Implementation</p>
+        </header>
+        
+        <div class="architecture-info">
+            <h2>Stage 4 Architecture Features:</h2>
+            <ul>
+                <li>✅ Redis Cache Layer for Database Queries</li>
+                <li>✅ CDN Simulation for Static Assets</li>
+                <li>✅ NGINX Proxy Caching</li>
+                <li>✅ Cache Warming & Invalidation</li>
+                <li>✅ Cache Hit Rate Monitoring</li>
+                <li>✅ Multi-layered Caching Strategy</li>
+            </ul>
+        </div>
+
+        <div class="instance-info">
+            <h3>Instance Information:</h3>
+            <p>Instance ID: <span id="instance-id">Loading...</span></p>
+            <p>Cache Status: <span id="cache-status">Loading...</span></p>
+            <p>Uptime: <span id="uptime">Loading...</span></p>
+        </div>
+
+        <div class="api-endpoints">
+            <h3>Available Endpoints:</h3>
+            <ul>
+                <li><a href="/health" target="_blank">GET /health</a> - Health check</li>
+                <li><a href="/api/instance" target="_blank">GET /api/instance</a> - Instance info</li>
+                <li><a href="/api/cache/stats" target="_blank">GET /api/cache/stats</a> - Cache statistics</li>
+                <li><a href="/metrics" target="_blank">GET /metrics</a> - Prometheus metrics</li>
+                <li>POST /api/cache/warm - Warm cache</li>
+                <li>POST /api/cache/invalidate - Invalidate cache</li>
+            </ul>
+        </div>
+
+        <div class="performance-test">
+            <h3>Performance Testing:</h3>
+            <button onclick="loadTest()">Run Cache Load Test</button>
+            <div id="test-results"></div>
+        </div>
+    </div>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>
