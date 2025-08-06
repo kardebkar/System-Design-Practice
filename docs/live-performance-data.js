@@ -1,13 +1,13 @@
 window.livePerformanceData = {
-  lastUpdated: "2025-08-06T04:06:12Z",
-  buildNumber: "29",
-  commit: "dda69815b77e57757604f155484c8dbafa781155",
+  lastUpdated: "2025-08-06T04:23:09Z",
+  buildNumber: "30",
+  commit: "c0c04ad10996361e1bc1da01fe1631bb713c88b7",
   branch: "main",
   ciStatus: {
-    stage1: "success",
-    stage2: "success", 
-    stage3: "success",
-    stage4: "success"
+    stage1: "",
+    stage2: "",
+    stage3: "",
+    stage4: ""
   },
   metrics: {
     stage1: {
@@ -47,7 +47,7 @@ window.livePerformanceData = {
     },
     stage4: {
       name: "Cache + CDN", 
-      successRate: 98,
+      successRate: 85,
       metrics: {
         "10": { "response": 8, "ux": 100, "errors": 0 },
         "50": { "response": 9, "ux": 100, "errors": 0 },
@@ -82,5 +82,5 @@ window.livePerformanceData = {
   },
   improvement: "1000x from Stage 1, 62x from Stage 2, 2.5x from Stage 3",
   breakingPoint: 5000,
-  runUrl: "https://github.com/kardebkar/System-Design-Practice/actions/runs/16767212362"
+  runUrl: "https://github.com/kardebkar/System-Design-Practice/actions/runs/16767429758"
 };
