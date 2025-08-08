@@ -861,7 +861,7 @@ jobs:
           // Evolution Showcase Navigation
           let currentStage = 1;
           
-          function navigateStage(direction) {
+          window.navigateStage = function(direction) {
               const newStage = currentStage + direction;
               if (newStage >= 1 && newStage <= 4) {
                   showStage(newStage);
@@ -930,9 +930,9 @@ jobs:
                   });
               }, observerOptions);
               
-              // Observe all timeline elements
-              const timelineElements = document.querySelectorAll('.timeline-stage, .stage-detail');
-              timelineElements.forEach(element => {
+              // Observe evolution showcase elements
+              const evolutionElements = document.querySelectorAll('.stage-card, .step, .evolution-controls');
+              evolutionElements.forEach(element => {
                   element.style.opacity = '0';
                   element.style.transform = 'translateY(20px)';
                   element.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
@@ -1689,53 +1689,6 @@ jobs:
                       font-size: 1rem;
                   }
                   
-                  .timeline-container {
-                      position: relative;
-                      margin: 40px 0;
-                      padding: 60px 0 40px 0;
-                  }
-                  
-                  .timeline-path {
-                      position: absolute;
-                      top: 80px;
-                      left: 5%;
-                      right: 5%;
-                      height: 6px;
-                      z-index: 1;
-                  }
-                  
-                  .timeline-path svg {
-                      width: 100%;
-                      height: 6px;
-                  }
-                  
-                  #timelinePath {
-                      animation: drawPath 3s ease-in-out infinite;
-                  }
-                  
-                  @keyframes drawPath {
-                      0% { stroke-dasharray: 0, 1000; }
-                      50% { stroke-dasharray: 800, 200; }
-                      100% { stroke-dasharray: 1000, 0; }
-                  }
-                  
-                  .timeline-stages {
-                      position: relative;
-                      height: 160px;
-                      z-index: 2;
-                  }
-                  
-                  .timeline-stage {
-                      position: absolute;
-                      text-align: center;
-                      cursor: pointer;
-                      transition: all 0.3s ease;
-                      z-index: 3;
-                  }
-                  
-                  .timeline-stage:hover {
-                      transform: translateY(-5px);
-                  }
                   
                   .stage-marker {
                       position: relative;
@@ -2019,29 +1972,33 @@ jobs:
                           max-width: 280px;
                       }
                       
-                      .timeline-stages {
-                          display: block;
-                          height: auto;
+                      .progress-stepper {
+                          max-width: 100%;
+                          padding: 0 10px;
                       }
                       
-                      .timeline-container {
-                          padding: 20px 0;
+                      .step-circle {
+                          width: 50px;
+                          height: 50px;
+                          font-size: 1.2rem;
                       }
                       
-                      .timeline-path {
-                          display: none;
+                      .step span {
+                          font-size: 0.75rem;
                       }
                       
-                      .stage-info {
-                          width: 100%;
-                          margin-left: 0;
-                          margin-top: 12px;
-                          text-align: center;
+                      .stage-card {
+                          padding: 20px;
                       }
                       
-                      .stage-marker {
-                          width: 70px;
-                          height: 70px;
+                      .evolution-controls {
+                          flex-direction: column;
+                          gap: 15px;
+                      }
+                      
+                      .prev-btn, .next-btn {
+                          padding: 10px 20px;
+                          font-size: 0.9rem;
                       }
                       
                       .stage-icon {
@@ -2053,7 +2010,7 @@ jobs:
                           font-size: 10px;
                       }
                       
-                      .journey-timeline {
+                      .evolution-showcase {
                           padding: 16px;
                           margin-top: 24px;
                       }
@@ -2095,7 +2052,7 @@ jobs:
                           padding: 2px 6px;
                       }
                       
-                      .journey-timeline {
+                      .evolution-showcase {
                           padding: 12px;
                           margin-top: 20px;
                       }
