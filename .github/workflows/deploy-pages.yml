@@ -775,28 +775,108 @@ jobs:
               const timelineStages = document.querySelectorAll('.timeline-stage');
               const stageDetails = document.querySelectorAll('.stage-detail');
               
+              // Stage-specific data for metrics animation
+              const stageMetrics = {
+                  1: { cache: 0, response: 15000, users: 50, uptime: 65 },
+                  2: { cache: 20, response: 1500, users: 200, uptime: 85 },
+                  3: { cache: 60, response: 85, users: 2000, uptime: 95 },
+                  4: { cache: 85, response: 35, users: 5000, uptime: 99.8 }
+              };
+              
               // Set first stage as active by default
               if (timelineStages.length > 0) {
                   timelineStages[0].querySelector('.stage-marker').classList.add('active');
                   stageDetails[0].classList.add('active');
+                  updateMetrics(1);
               }
               
               // Add click handlers to timeline stages
               timelineStages.forEach((stage, index) => {
                   stage.addEventListener('click', function() {
-                      const stageNumber = this.getAttribute('data-stage');
+                      const stageNumber = parseInt(this.getAttribute('data-stage'));
                       showStageDetail(stageNumber);
                       animateStageTransition(index);
+                      updateMetrics(stageNumber);
                   });
               });
               
-              // Auto-rotate through stages every 10 seconds
+              // Auto-rotate through stages every 12 seconds with metrics update
               let currentStage = 0;
               setInterval(() => {
                   currentStage = (currentStage + 1) % 4;
-                  showStageDetail(currentStage + 1);
+                  const stageNumber = currentStage + 1;
+                  showStageDetail(stageNumber);
                   animateStageTransition(currentStage);
-              }, 10000);
+                  updateMetrics(stageNumber);
+              }, 12000);
+          }
+          
+          function updateMetrics(stageNumber) {
+              const stageData = {
+                  1: { cache: 0, response: 15000, users: 50, uptime: 65 },
+                  2: { cache: 20, response: 1500, users: 200, uptime: 85 },
+                  3: { cache: 60, response: 85, users: 2000, uptime: 95 },
+                  4: { cache: 85, response: 35, users: 5000, uptime: 99.8 }
+              };
+              
+              const data = stageData[stageNumber];
+              if (!data) return;
+              
+              // Animate cache hit rate
+              animateMetric('cacheHitRate', data.cache, '%');
+              
+              // Animate response time
+              animateMetric('maxResponseTime', data.response, 'ms');
+              
+              // Animate concurrent users
+              animateMetric('concurrentUsers', data.users, '');
+              
+              // Animate uptime SLA
+              animateMetric('uptimeSLA', data.uptime, '%');
+          }
+          
+          function animateMetric(elementId, targetValue, suffix) {
+              const element = document.getElementById(elementId);
+              if (!element) return;
+              
+              const metricElement = element.querySelector('.metric-large');
+              const currentValue = parseFloat(metricElement.textContent) || 0;
+              
+              const duration = 2000;
+              const steps = 60;
+              const stepValue = (targetValue - currentValue) / steps;
+              const stepDuration = duration / steps;
+              
+              let currentStep = 0;
+              
+              const interval = setInterval(() => {
+                  currentStep++;
+                  const newValue = currentValue + (stepValue * currentStep);
+                  
+                  let displayValue;
+                  if (targetValue >= 1000) {
+                      displayValue = Math.round(newValue).toLocaleString() + suffix;
+                  } else if (targetValue < 1) {
+                      displayValue = newValue.toFixed(1) + suffix;
+                  } else {
+                      displayValue = Math.round(newValue * 10) / 10 + suffix;
+                  }
+                  
+                  metricElement.textContent = displayValue;
+                  
+                  // Add visual feedback
+                  metricElement.style.transform = 'scale(1.1)';
+                  setTimeout(() => {
+                      metricElement.style.transform = 'scale(1)';
+                  }, 100);
+                  
+                  if (currentStep >= steps) {
+                      metricElement.textContent = targetValue >= 1000 ? 
+                          targetValue.toLocaleString() + suffix : 
+                          targetValue + suffix;
+                      clearInterval(interval);
+                  }
+              }, stepDuration);
           }
           
           function showStageDetail(stageNumber) {
@@ -1356,14 +1436,15 @@ jobs:
                   .timeline-path {
                       position: absolute;
                       top: 80px;
-                      left: 0;
-                      right: 0;
-                      height: 4px;
+                      left: 5%;
+                      right: 5%;
+                      height: 6px;
+                      z-index: 1;
                   }
                   
                   .timeline-path svg {
                       width: 100%;
-                      height: 4px;
+                      height: 6px;
                   }
                   
                   #timelinePath {
@@ -1379,6 +1460,7 @@ jobs:
                   .timeline-stages {
                       position: relative;
                       height: 160px;
+                      z-index: 2;
                   }
                   
                   .timeline-stage {
@@ -1386,6 +1468,7 @@ jobs:
                       text-align: center;
                       cursor: pointer;
                       transition: all 0.3s ease;
+                      z-index: 3;
                   }
                   
                   .timeline-stage:hover {
@@ -1489,6 +1572,28 @@ jobs:
                       border: 1px solid rgba(102, 126, 234, 0.1);
                       box-shadow: 0 2px 10px rgba(0,0,0,0.05);
                       animation: fadeInUp 0.5s ease-out;
+                      max-height: 600px;
+                      overflow-y: auto;
+                      scrollbar-width: thin;
+                      scrollbar-color: rgba(102, 126, 234, 0.3) transparent;
+                  }
+                  
+                  .stage-detail::-webkit-scrollbar {
+                      width: 6px;
+                  }
+                  
+                  .stage-detail::-webkit-scrollbar-track {
+                      background: rgba(102, 126, 234, 0.1);
+                      border-radius: 3px;
+                  }
+                  
+                  .stage-detail::-webkit-scrollbar-thumb {
+                      background: rgba(102, 126, 234, 0.3);
+                      border-radius: 3px;
+                  }
+                  
+                  .stage-detail::-webkit-scrollbar-thumb:hover {
+                      background: rgba(102, 126, 234, 0.5);
                   }
                   
                   .stage-detail.active {
@@ -1788,22 +1893,22 @@ jobs:
                       
                       <div class="card" style="grid-column: 1 / -1; background: linear-gradient(135deg, rgba(102, 126, 234, 0.05), rgba(118, 75, 162, 0.05)); border: 2px solid rgba(102, 126, 234, 0.2);">
                           <h2 style="text-align: center; color: #667eea; font-size: 2em; margin-bottom: 30px;">🎉 Stage 4 Achievement Unlocked!</h2>
-                          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px;">
-                              <div class="metric-container">
-                                  <div class="metric-large" style="font-size: clamp(2rem, 6vw, 2.5rem);">85%</div>
-                                  <div class="metric-label">Cache Hit Rate</div>
+                          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 16px; margin-bottom: 30px;">
+                              <div class="metric-container" id="cacheHitRate">
+                                  <div class="metric-large" style="font-size: clamp(1.6rem, 4.5vw, 2rem);" data-start="0" data-end="85">0%</div>
+                                  <div class="metric-label" style="font-size: clamp(0.7rem, 2vw, 0.8rem); line-height: 1.2;">Cache Hit Rate</div>
                               </div>
-                              <div class="metric-container">
-                                  <div class="metric-large" style="font-size: clamp(2rem, 6vw, 2.5rem);">35ms</div>
-                                  <div class="metric-label">Max Response Time</div>
+                              <div class="metric-container" id="maxResponseTime">
+                                  <div class="metric-large" style="font-size: clamp(1.6rem, 4.5vw, 2rem);" data-start="15000" data-end="35">15000ms</div>
+                                  <div class="metric-label" style="font-size: clamp(0.7rem, 2vw, 0.8rem); line-height: 1.2;">Max Response Time</div>
                               </div>
-                              <div class="metric-container">
-                                  <div class="metric-large" style="font-size: clamp(2rem, 6vw, 2.5rem);">5000+</div>
-                                  <div class="metric-label">Concurrent Users</div>
+                              <div class="metric-container" id="concurrentUsers">
+                                  <div class="metric-large" style="font-size: clamp(1.6rem, 4.5vw, 2rem);" data-start="50" data-end="5000">50</div>
+                                  <div class="metric-label" style="font-size: clamp(0.7rem, 2vw, 0.8rem); line-height: 1.2;">Concurrent Users</div>
                               </div>
-                              <div class="metric-container">
-                                  <div class="metric-large" style="font-size: clamp(2rem, 6vw, 2.5rem);">99.9%</div>
-                                  <div class="metric-label">Uptime SLA</div>
+                              <div class="metric-container" id="uptimeSLA">
+                                  <div class="metric-large" style="font-size: clamp(1.6rem, 4.5vw, 2rem);" data-start="65" data-end="99.8">65%</div>
+                                  <div class="metric-label" style="font-size: clamp(0.7rem, 2vw, 0.8rem); line-height: 1.2;">Uptime SLA</div>
                               </div>
                           </div>
                           
@@ -1812,8 +1917,23 @@ jobs:
                               <h3 style="text-align: center; color: #667eea; margin-bottom: 25px; font-size: 1.3em;">🗺️ Our Performance Journey - Click Each Stage!</h3>
                               <div class="timeline-container">
                                   <div class="timeline-path">
-                                      <svg width="100%" height="4">
-                                          <line x1="0" y1="2" x2="100%" y2="2" stroke="#e0e6ed" stroke-width="4" stroke-dasharray="0, 1000" id="timelinePath"/>
+                                      <svg width="100%" height="6" viewBox="0 0 1000 6">
+                                          <defs>
+                                              <linearGradient id="flowingGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                                  <stop offset="0%" stop-color="#e0e6ed" stop-opacity="1"/>
+                                                  <stop offset="25%" stop-color="#dc3545" stop-opacity="1"/>
+                                                  <stop offset="50%" stop-color="#ffc107" stop-opacity="1"/>
+                                                  <stop offset="75%" stop-color="#007bff" stop-opacity="1"/>
+                                                  <stop offset="100%" stop-color="#28a745" stop-opacity="1"/>
+                                              </linearGradient>
+                                              <mask id="progressMask">
+                                                  <rect x="0" y="0" width="0" height="6" fill="white" id="progressRect">
+                                                      <animate attributeName="width" from="0" to="1000" dur="8s" repeatCount="indefinite"/>
+                                                  </rect>
+                                              </mask>
+                                          </defs>
+                                          <line x1="0" y1="3" x2="1000" y2="3" stroke="#e0e6ed" stroke-width="4"/>
+                                          <line x1="0" y1="3" x2="1000" y2="3" stroke="url(#flowingGradient)" stroke-width="4" mask="url(#progressMask)" id="flowingLine"/>
                                       </svg>
                                   </div>
                                   
