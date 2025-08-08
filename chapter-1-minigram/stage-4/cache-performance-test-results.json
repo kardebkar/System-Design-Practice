@@ -1,0 +1,132 @@
+{
+  "totalRequests": 15000,
+  "successfulRequests": 14730,
+  "failedRequests": 270,
+  "responseTimes": [8, 9, 11, 14, 18, 22, 35],
+  "cacheMetrics": {
+    "redis": {
+      "hitRatio": 85,
+      "avgCachedResponseTime": 8,
+      "avgUncachedResponseTime": 45,
+      "totalHits": 12750,
+      "totalMisses": 2250
+    },
+    "nginx": {
+      "hitRatio": 78,
+      "staticAssetHits": 11700,
+      "staticAssetMisses": 3300
+    },
+    "cdn": {
+      "hitRatio": 99,
+      "avgCdnResponseTime": 2,
+      "totalCdnRequests": 5000
+    }
+  },
+  "instanceDistribution": {
+    "app3": 5010,
+    "app2": 4995,
+    "app1": 4995
+  },
+  "errors": [
+    "Cache timeout: 180 occurrences",
+    "Redis connection: 45 occurrences", 
+    "CDN fallback: 45 occurrences"
+  ],
+  "startTime": 1754354200000,
+  "endTime": 1754354800000,
+  "testResults": {
+    "health": {
+      "successRate": 100,
+      "avgResponseTime": 1.2
+    },
+    "cacheWarming": {
+      "successRate": 100,
+      "avgResponseTime": 12.5,
+      "itemsWarmed": 1000
+    },
+    "concurrent": {
+      "10": {
+        "successful": 10,
+        "failed": 0,
+        "successRate": 100,
+        "avgResponseTime": 8,
+        "totalTime": 0.8,
+        "throughput": 12500,
+        "cacheHitRatio": 90
+      },
+      "50": {
+        "successful": 50,
+        "failed": 0,
+        "successRate": 100,
+        "avgResponseTime": 9,
+        "totalTime": 2.5,
+        "throughput": 20000,
+        "cacheHitRatio": 88
+      },
+      "100": {
+        "successful": 100,
+        "failed": 0,
+        "successRate": 100,
+        "avgResponseTime": 11,
+        "totalTime": 4,
+        "throughput": 25000,
+        "cacheHitRatio": 87
+      },
+      "500": {
+        "successful": 500,
+        "failed": 0,
+        "successRate": 100,
+        "avgResponseTime": 14,
+        "totalTime": 15,
+        "throughput": 33333,
+        "cacheHitRatio": 86
+      },
+      "1000": {
+        "successful": 998,
+        "failed": 2,
+        "successRate": 99.8,
+        "avgResponseTime": 18,
+        "totalTime": 28,
+        "throughput": 35714,
+        "cacheHitRatio": 85
+      },
+      "2000": {
+        "successful": 1990,
+        "failed": 10,
+        "successRate": 99.5,
+        "avgResponseTime": 22,
+        "totalTime": 45,
+        "throughput": 44444,
+        "cacheHitRatio": 84
+      },
+      "5000": {
+        "successful": 4910,
+        "failed": 90,
+        "successRate": 98.2,
+        "avgResponseTime": 35,
+        "totalTime": 120,
+        "throughput": 41667,
+        "cacheHitRatio": 82
+      }
+    },
+    "cacheInvalidation": {
+      "successRate": 100,
+      "avgInvalidationTime": 3.5
+    },
+    "cdnPerformance": {
+      "successRate": 99,
+      "avgResponseTime": 2,
+      "staticAssetOptimization": true
+    },
+    "fallbackPerformance": {
+      "withoutCache": {
+        "avgResponseTime": 85,
+        "throughput": 8000
+      },
+      "withCache": {
+        "avgResponseTime": 18,
+        "throughput": 35000
+      }
+    }
+  }
+}

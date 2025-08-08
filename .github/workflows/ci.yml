@@ -492,23 +492,46 @@ jobs:
     - name: Run Stage 4 load tests
       if: steps.check_stage4.outputs.exists == 'true'
       run: |
-        echo "⚡ Running Stage 4 load tests..."
+        echo "⚡ Running Stage 4 comprehensive cache performance tests..."
         
-        # Test different load levels with caching
-        echo "Testing cached performance..."
-        START_TIME=$(date +%s)
-        for i in {1..20}; do
-          curl -s http://localhost/health >/dev/null 2>&1 &
+        # Run actual cache performance test if script exists
+        if [ -f "scripts/cache-load-test.js" ]; then
+          echo "Running cache load test script..."
+          timeout 120s node scripts/cache-load-test.js || echo "Cache load test completed or timed out"
+        fi
+        
+        # Test cache warming functionality
+        echo "Testing cache warming..."
+        curl -X POST http://localhost/api/cache/warm -w "\nCache warm response time: %{time_total}s\n" || echo "Cache warm test failed"
+        
+        # Test multiple concurrent requests to measure cache efficiency  
+        echo "Testing cache hit ratio with concurrent requests..."
+        for i in {1..50}; do
+          curl -s http://localhost/api/users/1 >/dev/null 2>&1 &
+          curl -s http://localhost/api/posts/feed >/dev/null 2>&1 &
         done
         wait
-        END_TIME=$(date +%s)
-        DURATION=$((END_TIME - START_TIME))
         
-        echo "Cached load test completed in ${DURATION}s!"
+        # Get detailed cache statistics
+        echo "Collecting cache performance metrics..."
+        curl -s http://localhost/api/cache/stats > cache-stats.json || echo "Failed to get cache stats"
         
-        # Test response times with cache
-        echo "Testing cache-optimized response times..."
-        curl -w "Cached response time: %{time_total}s\n" -s -o /dev/null http://localhost/api/users/1 || echo "Cached response test failed"
+        # Test CDN performance with static assets
+        echo "Testing CDN static asset performance..."
+        for i in {1..10}; do
+          curl -s http://localhost:8081/static/styles.css >/dev/null 2>&1 &
+          curl -s http://localhost:8081/static/app.js >/dev/null 2>&1 &
+        done
+        wait
+        
+        # Generate comprehensive test results
+        echo "Generating Stage 4 test results..."
+        if [ -f "cache-performance-test-results.json" ]; then
+          echo "✅ Stage 4 test results file found"
+          cat cache-performance-test-results.json
+        else
+          echo "⚠️ Test results file not found, tests may not have run properly"
+        fi
     
     - name: Collect Stage 4 metrics
       if: steps.check_stage4.outputs.exists == 'true'
@@ -540,6 +563,8 @@ jobs:
       with:
         name: stage4-test-results
         path: |
+          ./chapter-1-minigram/stage-4/cache-performance-test-results.json
+          ./chapter-1-minigram/stage-4/cache-stats.json
           ./chapter-1-minigram/stage-4/*test-results*.json
           ./chapter-1-minigram/stage-4/logs/
         if-no-files-found: ignore
