@@ -1884,10 +1884,10 @@ jobs:
                           <h2>😊 User Experience</h2>
                           <div class="metric-container">
                               <div class="metric-large">99.8%</div>
-                              <div class="metric-label">Success Rate at Scale</div>
+                              <div class="metric-label">Success Rate</div>
                           </div>
-                          <p style="margin-top: 15px; color: #5a6c7d; line-height: 1.6;">
-                              Cache + CDN achieves enterprise-grade reliability with 85% cache hit rate and global distribution
+                          <p style="margin-top: 15px; color: #5a6c7d; line-height: 1.6; word-wrap: break-word; overflow-wrap: break-word; hyphens: auto;">
+                              Cache + CDN achieves enterprise reliability with global distribution
                           </p>
                       </div>
                       
@@ -1917,23 +1917,42 @@ jobs:
                               <h3 style="text-align: center; color: #667eea; margin-bottom: 25px; font-size: 1.3em;">🗺️ Our Performance Journey - Click Each Stage!</h3>
                               <div class="timeline-container">
                                   <div class="timeline-path">
-                                      <svg width="100%" height="6" viewBox="0 0 1000 6">
+                                      <svg width="100%" height="6" viewBox="0 0 1000 6" preserveAspectRatio="none">
                                           <defs>
-                                              <linearGradient id="flowingGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                                                  <stop offset="0%" stop-color="#e0e6ed" stop-opacity="1"/>
-                                                  <stop offset="25%" stop-color="#dc3545" stop-opacity="1"/>
-                                                  <stop offset="50%" stop-color="#ffc107" stop-opacity="1"/>
-                                                  <stop offset="75%" stop-color="#007bff" stop-opacity="1"/>
-                                                  <stop offset="100%" stop-color="#28a745" stop-opacity="1"/>
+                                              <linearGradient id="stageGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                                  <stop offset="0%" stop-color="#dc3545" stop-opacity="1" id="gradientStop1"/>
+                                                  <stop offset="33%" stop-color="#ffc107" stop-opacity="1" id="gradientStop2"/>
+                                                  <stop offset="66%" stop-color="#007bff" stop-opacity="1" id="gradientStop3"/>
+                                                  <stop offset="100%" stop-color="#28a745" stop-opacity="1" id="gradientStop4"/>
                                               </linearGradient>
-                                              <mask id="progressMask">
-                                                  <rect x="0" y="0" width="0" height="6" fill="white" id="progressRect">
-                                                      <animate attributeName="width" from="0" to="1000" dur="8s" repeatCount="indefinite"/>
-                                                  </rect>
-                                              </mask>
+                                              <linearGradient id="progressGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                                  <stop offset="0%" stop-color="rgba(102, 126, 234, 0.8)" stop-opacity="1"/>
+                                                  <stop offset="100%" stop-color="rgba(102, 126, 234, 0.3)" stop-opacity="1"/>
+                                              </linearGradient>
                                           </defs>
-                                          <line x1="0" y1="3" x2="1000" y2="3" stroke="#e0e6ed" stroke-width="4"/>
-                                          <line x1="0" y1="3" x2="1000" y2="3" stroke="url(#flowingGradient)" stroke-width="4" mask="url(#progressMask)" id="flowingLine"/>
+                                          <!-- Background line -->
+                                          <line x1="50" y1="3" x2="950" y2="3" stroke="#e0e6ed" stroke-width="4" stroke-linecap="round"/>
+                                          <!-- Animated progress line -->
+                                          <line x1="50" y1="3" x2="950" y2="3" stroke="url(#stageGradient)" stroke-width="6" stroke-linecap="round" 
+                                                id="progressLine" stroke-dasharray="900" stroke-dashoffset="900">
+                                              <animate attributeName="stroke-dashoffset" 
+                                                       values="900;0;900" 
+                                                       dur="12s" 
+                                                       repeatCount="indefinite"/>
+                                          </line>
+                                          <!-- Flow dots -->
+                                          <circle cx="50" cy="3" r="3" fill="#dc3545" opacity="0" id="dot1">
+                                              <animate attributeName="opacity" values="0;1;0" dur="12s" repeatCount="indefinite" begin="0s"/>
+                                          </circle>
+                                          <circle cx="350" cy="3" r="3" fill="#ffc107" opacity="0" id="dot2">
+                                              <animate attributeName="opacity" values="0;1;0" dur="12s" repeatCount="indefinite" begin="3s"/>
+                                          </circle>
+                                          <circle cx="650" cy="3" r="3" fill="#007bff" opacity="0" id="dot3">
+                                              <animate attributeName="opacity" values="0;1;0" dur="12s" repeatCount="indefinite" begin="6s"/>
+                                          </circle>
+                                          <circle cx="950" cy="3" r="3" fill="#28a745" opacity="0" id="dot4">
+                                              <animate attributeName="opacity" values="0;1;0" dur="12s" repeatCount="indefinite" begin="9s"/>
+                                          </circle>
                                       </svg>
                                   </div>
                                   
