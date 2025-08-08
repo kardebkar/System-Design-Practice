@@ -798,12 +798,15 @@ jobs:
         };
         EOF
         
+        # Also create the v2 version that the HTML is actually loading
+        cp docs/live-performance-data.js docs/live-performance-data-v2.js
+        
     - name: Update dashboard with live data
       run: |
         # Commit the live data update
         git config --local user.email "action@github.com"
         git config --local user.name "GitHub Action"
-        git add docs/live-performance-data.js
+        git add docs/live-performance-data.js docs/live-performance-data-v2.js
         git diff --staged --quiet || git commit -m "📊 Update dashboard with latest CI/CD results (Build #${{ github.run_number }})"
         
     - name: Push changes
