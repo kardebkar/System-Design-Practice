@@ -1006,42 +1006,110 @@ jobs:
                   .card {
                       background: white;
                       border-radius: 16px;
-                      padding: 30px;
+                      padding: 24px;
                       box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-                      transition: all 0.3s ease;
+                      transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
                       animation: slideInUp 0.6s ease-out;
                       border: 1px solid rgba(102, 126, 234, 0.1);
+                      overflow: hidden;
+                      word-wrap: break-word;
+                      hyphens: auto;
                   }
                   
                   .card:hover {
-                      transform: translateY(-4px);
-                      box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+                      transform: translateY(-6px);
+                      box-shadow: 0 12px 40px rgba(0,0,0,0.15);
+                      border-color: rgba(102, 126, 234, 0.2);
                   }
                   
                   .card h2 {
                       color: #667eea;
-                      margin-bottom: 20px;
-                      font-size: 1.5em;
+                      margin-bottom: 16px;
+                      font-size: 1.4em;
+                      line-height: 1.3;
+                      word-break: break-word;
                   }
                   
+                  .card p {
+                      line-height: 1.6;
+                      color: #5a6c7d;
+                      margin-bottom: 12px;
+                      word-wrap: break-word;
+                      overflow-wrap: break-word;
+                  }
+                  
+                  
                   .metric-large {
-                      font-size: 4em;
+                      font-size: clamp(2.5rem, 8vw, 4rem);
                       font-weight: 800;
                       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
                       -webkit-background-clip: text;
                       -webkit-text-fill-color: transparent;
-                      animation: countUp 1s ease-out;
-                      margin: 20px 0;
+                      animation: countUp 1.2s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+                      margin: 16px 0;
+                      line-height: 1;
+                      position: relative;
+                      display: inline-block;
+                      cursor: pointer;
+                  }
+                  
+                  .metric-large::before {
+                      content: '';
+                      position: absolute;
+                      top: -10px;
+                      left: -10px;
+                      right: -10px;
+                      bottom: -10px;
+                      background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+                      border-radius: 12px;
+                      opacity: 0;
+                      transition: all 0.3s ease;
+                      z-index: -1;
                   }
                   
                   .metric-large:hover {
+                      transform: scale(1.08) rotate(1deg);
+                      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+                  }
+                  
+                  .metric-large:hover::before {
+                      opacity: 1;
                       transform: scale(1.05);
-                      transition: transform 0.3s ease;
+                  }
+                  
+                  .metric-container {
+                      text-align: center;
+                      padding: 20px;
+                      border-radius: 12px;
+                      transition: all 0.3s ease;
+                      position: relative;
+                      overflow: hidden;
+                  }
+                  
+                  .metric-container::after {
+                      content: '';
+                      position: absolute;
+                      top: -50%;
+                      left: -50%;
+                      width: 200%;
+                      height: 200%;
+                      background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
+                      transform: rotate(45deg) translateX(-100%);
+                      transition: transform 0.6s ease;
+                  }
+                  
+                  .metric-container:hover::after {
+                      transform: rotate(45deg) translateX(100%);
                   }
                   
                   .metric-label {
-                      color: #666;
-                      font-size: 0.9em;
+                      color: #5a6c7d;
+                      font-size: clamp(0.85rem, 2.5vw, 0.95rem);
+                      font-weight: 600;
+                      letter-spacing: 0.5px;
+                      text-transform: uppercase;
+                      margin-top: 8px;
+                      line-height: 1.4;
                   }
                   
                   .comparison-table {
@@ -1058,25 +1126,39 @@ jobs:
                   table {
                       width: 100%;
                       border-collapse: collapse;
+                      font-size: clamp(0.8rem, 2.5vw, 0.95rem);
                   }
                   
                   th {
                       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
                       color: white;
-                      padding: 15px;
+                      padding: clamp(12px, 3vw, 16px);
                       text-align: left;
                       font-weight: 600;
+                      font-size: clamp(0.75rem, 2.2vw, 0.9rem);
+                      white-space: nowrap;
+                      overflow: hidden;
+                      text-overflow: ellipsis;
                   }
                   
                   td {
-                      padding: 15px;
+                      padding: clamp(12px, 3vw, 16px);
                       border-bottom: 1px solid #e0e0e0;
+                      word-wrap: break-word;
+                      overflow-wrap: break-word;
+                      hyphens: auto;
+                      max-width: 0;
+                      min-width: 100px;
+                  }
+                  
+                  tr {
+                      transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
                   }
                   
                   tr:hover {
-                      background: linear-gradient(90deg, #f8f9fa, rgba(102, 126, 234, 0.1), #f8f9fa);
-                      transform: scale(1.01);
-                      transition: all 0.3s ease;
+                      background: linear-gradient(90deg, #f8f9fa, rgba(102, 126, 234, 0.05), #f8f9fa);
+                      transform: translateX(4px);
+                      box-shadow: 4px 0 12px rgba(102, 126, 234, 0.1);
                   }
                   
                   tbody tr {
@@ -1187,41 +1269,72 @@ jobs:
                   .status-failure { color: #dc3545; }
                   .status-pending { color: #ffc107; }
                   
+                  @media (max-width: 1024px) {
+                      .cards-grid {
+                          grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+                          gap: 20px;
+                      }
+                  }
+                  
                   @media (max-width: 768px) {
                       .header h1 {
-                          font-size: 2em;
+                          font-size: clamp(1.8rem, 6vw, 2.2rem);
                       }
                       .cards-grid {
                           grid-template-columns: 1fr;
+                          gap: 16px;
                       }
                       .share-buttons {
                           flex-direction: column;
                           align-items: center;
-                      }
-                      .comparison-table {
-                          font-size: 0.8em;
-                      }
-                      .metric-large {
-                          font-size: 3em;
-                      }
-                      .badge {
-                          font-size: 0.8em;
-                          padding: 8px 16px;
-                      }
-                  }
-                  
-                  @media (max-width: 480px) {
-                      .header h1 {
-                          font-size: 1.5em;
-                      }
-                      .metric-large {
-                          font-size: 2.5em;
+                          gap: 12px;
                       }
                       .card {
                           padding: 20px;
                       }
+                      .badge {
+                          font-size: 0.8rem;
+                          padding: 8px 16px;
+                      }
                       .comparison-table {
-                          font-size: 0.7em;
+                          padding: 16px;
+                      }
+                      table {
+                          font-size: 0.8rem;
+                      }
+                      th, td {
+                          padding: 8px 6px;
+                      }
+                  }
+                  
+                  @media (max-width: 480px) {
+                      body {
+                          padding: 12px;
+                      }
+                      .header h1 {
+                          font-size: clamp(1.4rem, 8vw, 1.8rem);
+                      }
+                      .card {
+                          padding: 16px;
+                          border-radius: 12px;
+                      }
+                      .comparison-table {
+                          padding: 12px;
+                          border-radius: 12px;
+                      }
+                      table {
+                          font-size: 0.7rem;
+                      }
+                      th, td {
+                          padding: 6px 4px;
+                      }
+                      .badge {
+                          font-size: 0.75rem;
+                          padding: 6px 12px;
+                      }
+                      .share-btn {
+                          padding: 10px 20px;
+                          font-size: 0.9rem;
                       }
                   }
                   
@@ -1319,19 +1432,26 @@ jobs:
                   .stage-info {
                       width: 140px;
                       margin-left: -30px;
+                      word-wrap: break-word;
+                      overflow-wrap: break-word;
+                      hyphens: auto;
                   }
                   
                   .stage-info h4 {
                       margin: 0 0 5px 0;
-                      font-size: 14px;
+                      font-size: clamp(12px, 2.8vw, 14px);
                       font-weight: bold;
                       color: #2c3e50;
+                      line-height: 1.2;
+                      word-break: break-word;
                   }
                   
                   .stage-info p {
                       margin: 0 0 8px 0;
-                      font-size: 12px;
+                      font-size: clamp(10px, 2.2vw, 12px);
                       color: #5a6c7d;
+                      line-height: 1.3;
+                      word-break: break-word;
                   }
                   
                   .stage-stats {
@@ -1341,10 +1461,15 @@ jobs:
                   }
                   
                   .stage-stats span {
-                      font-size: 11px;
-                      padding: 2px 6px;
-                      border-radius: 10px;
+                      font-size: clamp(9px, 2vw, 11px);
+                      padding: 3px 8px;
+                      border-radius: 12px;
                       font-weight: 600;
+                      line-height: 1.2;
+                      white-space: nowrap;
+                      overflow: hidden;
+                      text-overflow: ellipsis;
+                      max-width: 100px;
                   }
                   
                   .stat-bad { background: rgba(220, 53, 69, 0.1); color: #dc3545; }
@@ -1438,11 +1563,15 @@ jobs:
                       padding: 8px 12px;
                       background: white;
                       border-radius: 6px;
-                      font-size: 14px;
+                      font-size: clamp(11px, 2.5vw, 14px);
                       font-weight: 600;
                       color: #2c3e50;
                       text-align: center;
                       box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+                      word-break: break-word;
+                      overflow-wrap: break-word;
+                      hyphens: auto;
+                      line-height: 1.3;
                   }
                   
                   .instances {
@@ -1517,16 +1646,19 @@ jobs:
                   @media (max-width: 768px) {
                       .timeline-stage {
                           position: relative !important;
-                          display: inline-block;
-                          margin: 0 10px 20px 10px;
+                          display: block;
+                          margin: 0 auto 24px auto;
+                          width: 100%;
+                          max-width: 280px;
                       }
                       
                       .timeline-stages {
-                          display: flex;
-                          flex-wrap: wrap;
-                          justify-content: center;
+                          display: block;
                           height: auto;
-                          gap: 20px;
+                      }
+                      
+                      .timeline-container {
+                          padding: 20px 0;
                       }
                       
                       .timeline-path {
@@ -1534,12 +1666,71 @@ jobs:
                       }
                       
                       .stage-info {
-                          width: 120px;
-                          margin-left: -20px;
+                          width: 100%;
+                          margin-left: 0;
+                          margin-top: 12px;
+                          text-align: center;
+                      }
+                      
+                      .stage-marker {
+                          width: 70px;
+                          height: 70px;
+                      }
+                      
+                      .stage-icon {
+                          font-size: 20px;
+                      }
+                      
+                      .stage-stats span {
+                          max-width: 140px;
+                          font-size: 10px;
                       }
                       
                       .journey-timeline {
-                          padding: 20px;
+                          padding: 16px;
+                          margin-top: 24px;
+                      }
+                      
+                      .detail-content {
+                          grid-template-columns: 1fr !important;
+                      }
+                      
+                      .detail-architecture {
+                          grid-row: unset !important;
+                      }
+                  }
+                  
+                  @media (max-width: 480px) {
+                      .timeline-stage {
+                          max-width: 240px;
+                      }
+                      
+                      .stage-marker {
+                          width: 60px;
+                          height: 60px;
+                      }
+                      
+                      .stage-icon {
+                          font-size: 18px;
+                      }
+                      
+                      .stage-info h4 {
+                          font-size: 13px;
+                      }
+                      
+                      .stage-info p {
+                          font-size: 11px;
+                      }
+                      
+                      .stage-stats span {
+                          max-width: 120px;
+                          font-size: 9px;
+                          padding: 2px 6px;
+                      }
+                      
+                      .journey-timeline {
+                          padding: 12px;
+                          margin-top: 20px;
                       }
                   }
               </style>
@@ -1564,48 +1755,54 @@ jobs:
                   <div class="cards-grid">
                       <div class="card">
                           <h2>🎯 Key Achievement</h2>
-                          <div class="metric-large">1000x</div>
-                          <div class="metric-label">Performance Improvement at Scale</div>
-                          <p style="margin-top: 15px; color: #666;">
-                              Load Balancer maintains 12-85ms response time across all loads while SQLite fails at 100+ users.
+                          <div class="metric-container">
+                              <div class="metric-large">1000x</div>
+                              <div class="metric-label">Performance Improvement at Scale</div>
+                          </div>
+                          <p style="margin-top: 15px; color: #5a6c7d; line-height: 1.6;">
+                              Cache + CDN maintains 8-35ms response time across all loads while SQLite fails at 100+ users.
                           </p>
                       </div>
                       
                       <div class="card">
                           <h2>📈 User Capacity</h2>
-                          <div class="metric-large">100x</div>
-                          <div class="metric-label">More Concurrent Users</div>
-                          <p style="margin-top: 15px; color: #666;">
+                          <div class="metric-container">
+                              <div class="metric-large">100x</div>
+                              <div class="metric-label">More Concurrent Users</div>
+                          </div>
+                          <p style="margin-top: 15px; color: #5a6c7d; line-height: 1.6;">
                               Breaking point: SQLite at 50 users, Cache + CDN handles 5000+
                           </p>
                       </div>
                       
                       <div class="card">
                           <h2>😊 User Experience</h2>
-                          <div class="metric-large">98.2/100</div>
-                          <div class="metric-label">UX Score at 5000+ Users</div>
-                          <p style="margin-top: 15px; color: #666;">
-                              Cache + CDN maintains near-perfect UX even at extreme scale with 85% cache hit rate
+                          <div class="metric-container">
+                              <div class="metric-large">99.8%</div>
+                              <div class="metric-label">Success Rate at Scale</div>
+                          </div>
+                          <p style="margin-top: 15px; color: #5a6c7d; line-height: 1.6;">
+                              Cache + CDN achieves enterprise-grade reliability with 85% cache hit rate and global distribution
                           </p>
                       </div>
                       
                       <div class="card" style="grid-column: 1 / -1; background: linear-gradient(135deg, rgba(102, 126, 234, 0.05), rgba(118, 75, 162, 0.05)); border: 2px solid rgba(102, 126, 234, 0.2);">
                           <h2 style="text-align: center; color: #667eea; font-size: 2em; margin-bottom: 30px;">🎉 Stage 4 Achievement Unlocked!</h2>
                           <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px;">
-                              <div style="text-align: center;">
-                                  <div class="metric-large" style="font-size: 2.5em;">85%</div>
+                              <div class="metric-container">
+                                  <div class="metric-large" style="font-size: clamp(2rem, 6vw, 2.5rem);">85%</div>
                                   <div class="metric-label">Cache Hit Rate</div>
                               </div>
-                              <div style="text-align: center;">
-                                  <div class="metric-large" style="font-size: 2.5em;">35ms</div>
+                              <div class="metric-container">
+                                  <div class="metric-large" style="font-size: clamp(2rem, 6vw, 2.5rem);">35ms</div>
                                   <div class="metric-label">Max Response Time</div>
                               </div>
-                              <div style="text-align: center;">
-                                  <div class="metric-large" style="font-size: 2.5em;">5000+</div>
+                              <div class="metric-container">
+                                  <div class="metric-large" style="font-size: clamp(2rem, 6vw, 2.5rem);">5000+</div>
                                   <div class="metric-label">Concurrent Users</div>
                               </div>
-                              <div style="text-align: center;">
-                                  <div class="metric-large" style="font-size: 2.5em;">99.9%</div>
+                              <div class="metric-container">
+                                  <div class="metric-large" style="font-size: clamp(2rem, 6vw, 2.5rem);">99.9%</div>
                                   <div class="metric-label">Uptime SLA</div>
                               </div>
                           </div>
