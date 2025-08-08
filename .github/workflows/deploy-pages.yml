@@ -679,8 +679,8 @@ jobs:
                   });
               }
               
-              // Initialize interactive timeline
-              initializeTimeline();
+              // Initialize evolution showcase
+              initializeEvolution();
               
               // Load live data and initialize CI status
               loadLiveData();
@@ -768,47 +768,26 @@ jobs:
               initializeDashboard();
           }
 
-          // Interactive Timeline Functions
-          function initializeTimeline() {
-              console.log('Initializing interactive timeline');
+          // Evolution Showcase Functions
+          function initializeEvolution() {
+              console.log('Initializing evolution showcase');
               
-              const timelineStages = document.querySelectorAll('.timeline-stage');
-              const stageDetails = document.querySelectorAll('.stage-detail');
-              
-              // Stage-specific data for metrics animation
-              const stageMetrics = {
-                  1: { cache: 0, response: 15000, users: 50, uptime: 65 },
-                  2: { cache: 20, response: 1500, users: 200, uptime: 85 },
-                  3: { cache: 60, response: 85, users: 2000, uptime: 95 },
-                  4: { cache: 85, response: 35, users: 5000, uptime: 99.8 }
-              };
-              
-              // Set first stage as active by default
-              if (timelineStages.length > 0) {
-                  timelineStages[0].querySelector('.stage-marker').classList.add('active');
-                  stageDetails[0].classList.add('active');
-                  updateMetrics(1);
-              }
-              
-              // Add click handlers to timeline stages
-              timelineStages.forEach((stage, index) => {
-                  stage.addEventListener('click', function() {
+              // Add click handlers to stepper circles
+              document.querySelectorAll('.step').forEach(step => {
+                  step.addEventListener('click', function() {
                       const stageNumber = parseInt(this.getAttribute('data-stage'));
-                      showStageDetail(stageNumber);
-                      animateStageTransition(index);
-                      updateMetrics(stageNumber);
+                      showStage(stageNumber);
                   });
               });
               
-              // Auto-rotate through stages every 12 seconds with metrics update
-              let currentStage = 0;
+              // Initialize with stage 1
+              showStage(1);
+              
+              // Auto-progress through stages every 15 seconds
               setInterval(() => {
-                  currentStage = (currentStage + 1) % 4;
-                  const stageNumber = currentStage + 1;
-                  showStageDetail(stageNumber);
-                  animateStageTransition(currentStage);
-                  updateMetrics(stageNumber);
-              }, 12000);
+                  const nextStage = currentStage < 4 ? currentStage + 1 : 1;
+                  showStage(nextStage);
+              }, 15000);
           }
           
           function updateMetrics(stageNumber) {
@@ -879,53 +858,60 @@ jobs:
               }, stepDuration);
           }
           
-          function showStageDetail(stageNumber) {
-              console.log('Showing stage detail for stage:', stageNumber);
-              
-              // Hide all stage details
-              const allDetails = document.querySelectorAll('.stage-detail');
-              allDetails.forEach(detail => {
-                  detail.classList.remove('active');
-              });
-              
-              // Remove active class from all markers
-              const allMarkers = document.querySelectorAll('.stage-marker');
-              allMarkers.forEach(marker => {
-                  marker.classList.remove('active');
-              });
-              
-              // Show selected stage detail
-              const targetDetail = document.querySelector('.stage-detail[data-stage="' + stageNumber + '"]');
-              const targetMarker = document.querySelector('.timeline-stage[data-stage="' + stageNumber + '"] .stage-marker');
-              
-              if (targetDetail) {
-                  targetDetail.classList.add('active');
-              }
-              
-              if (targetMarker) {
-                  targetMarker.classList.add('active');
+          // Evolution Showcase Navigation
+          let currentStage = 1;
+          
+          function navigateStage(direction) {
+              const newStage = currentStage + direction;
+              if (newStage >= 1 && newStage <= 4) {
+                  showStage(newStage);
               }
           }
           
-          function animateStageTransition(stageIndex) {
-              console.log('Animating stage transition to:', stageIndex);
+          function showStage(stageNumber) {
+              console.log('Showing stage:', stageNumber);
+              currentStage = stageNumber;
               
-              // Create a subtle pulse animation on the timeline path
-              const timelinePath = document.getElementById('timelinePath');
-              if (timelinePath) {
-                  timelinePath.style.stroke = getStageColor(stageIndex);
-                  timelinePath.style.strokeWidth = '6';
-                  
-                  setTimeout(() => {
-                      timelinePath.style.stroke = '#e0e6ed';
-                      timelinePath.style.strokeWidth = '4';
-                  }, 1000);
-              }
+              // Update progress stepper
+              document.querySelectorAll('.step').forEach(step => {
+                  step.classList.remove('active');
+              });
+              document.querySelector(`[data-stage="${stageNumber}"]`).classList.add('active');
+              
+              // Update stage cards
+              document.querySelectorAll('.stage-card').forEach(card => {
+                  card.classList.remove('active');
+              });
+              document.querySelector(`.stage-card[data-stage="${stageNumber}"]`).classList.add('active');
+              
+              // Update navigation buttons
+              const prevBtn = document.querySelector('.prev-btn');
+              const nextBtn = document.querySelector('.next-btn');
+              const stageText = document.getElementById('currentStageText');
+              
+              if (prevBtn) prevBtn.disabled = (stageNumber === 1);
+              if (nextBtn) nextBtn.disabled = (stageNumber === 4);
+              if (stageText) stageText.textContent = `Stage ${stageNumber} of 4`;
+              
+              // Update the live metrics based on stage
+              updateLiveMetrics(stageNumber);
           }
           
-          function getStageColor(stageIndex) {
-              const colors = ['#dc3545', '#ffc107', '#007bff', '#28a745'];
-              return colors[stageIndex] || '#e0e6ed';
+          function updateLiveMetrics(stageNumber) {
+              const stageMetrics = {
+                  1: { cache: 0, response: 89, users: 50, uptime: 65 },
+                  2: { cache: 0, response: 45, users: 200, uptime: 78 },
+                  3: { cache: 45, response: 12, users: 2000, uptime: 95 },
+                  4: { cache: 85, response: 8, users: 5000, uptime: 99.8 }
+              };
+              
+              const metrics = stageMetrics[stageNumber];
+              if (metrics) {
+                  animateMetric('cacheHitRate', metrics.cache, '%');
+                  animateMetric('maxResponseTime', metrics.response, 'ms');
+                  animateMetric('concurrentUsers', metrics.users, '');
+                  animateMetric('uptimeSLA', metrics.uptime, '%');
+              }
           }
           
           // Add subtle scroll animations
@@ -1418,13 +1404,289 @@ jobs:
                       }
                   }
                   
-                  /* Interactive Journey Timeline Styles */
-                  .journey-timeline {
+                  /* Evolution Showcase Styles */
+                  .evolution-showcase {
                       margin-top: 40px;
                       padding: 30px;
-                      background: rgba(255, 255, 255, 0.6);
+                      background: rgba(255, 255, 255, 0.8);
                       border-radius: 16px;
                       border: 1px solid rgba(102, 126, 234, 0.15);
+                      backdrop-filter: blur(10px);
+                  }
+                  
+                  .progress-stepper {
+                      display: flex;
+                      justify-content: space-between;
+                      align-items: center;
+                      position: relative;
+                      margin: 30px 0 40px 0;
+                      max-width: 600px;
+                      margin-left: auto;
+                      margin-right: auto;
+                  }
+                  
+                  .stepper-line {
+                      position: absolute;
+                      top: 50%;
+                      left: 50px;
+                      right: 50px;
+                      height: 3px;
+                      background: linear-gradient(to right, #dc3545, #ffc107, #007bff, #28a745);
+                      border-radius: 2px;
+                      z-index: 1;
+                  }
+                  
+                  .step {
+                      display: flex;
+                      flex-direction: column;
+                      align-items: center;
+                      cursor: pointer;
+                      z-index: 2;
+                      transition: all 0.3s ease;
+                  }
+                  
+                  .step.active .step-circle {
+                      background: white;
+                      transform: scale(1.2);
+                      box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+                  }
+                  
+                  .step-circle {
+                      width: 60px;
+                      height: 60px;
+                      border-radius: 50%;
+                      border: 3px solid white;
+                      display: flex;
+                      align-items: center;
+                      justify-content: center;
+                      font-size: 1.5rem;
+                      margin-bottom: 8px;
+                      transition: all 0.3s ease;
+                      background: rgba(255,255,255,0.9);
+                      backdrop-filter: blur(10px);
+                  }
+                  
+                  .step span {
+                      font-size: 0.85rem;
+                      font-weight: 600;
+                      color: #667eea;
+                  }
+                  
+                  .stage-cards-container {
+                      position: relative;
+                      min-height: 500px;
+                  }
+                  
+                  .stage-card {
+                      display: none;
+                      background: rgba(255, 255, 255, 0.9);
+                      border-radius: 16px;
+                      padding: 30px;
+                      border: 1px solid rgba(102, 126, 234, 0.2);
+                      backdrop-filter: blur(10px);
+                      animation: fadeInUp 0.5s ease-out;
+                  }
+                  
+                  .stage-card.active {
+                      display: block;
+                  }
+                  
+                  @keyframes fadeInUp {
+                      from { opacity: 0; transform: translateY(20px); }
+                      to { opacity: 1; transform: translateY(0); }
+                  }
+                  
+                  .card-header {
+                      display: flex;
+                      align-items: center;
+                      gap: 15px;
+                      margin-bottom: 25px;
+                      flex-wrap: wrap;
+                  }
+                  
+                  .stage-badge {
+                      padding: 6px 12px;
+                      border-radius: 20px;
+                      font-size: 0.8rem;
+                      font-weight: bold;
+                      text-transform: uppercase;
+                  }
+                  
+                  .stage-1-badge { background: #dc3545; color: white; }
+                  .stage-2-badge { background: #ffc107; color: #333; }
+                  .stage-3-badge { background: #007bff; color: white; }
+                  .stage-4-badge { background: #28a745; color: white; }
+                  
+                  .card-header h4 {
+                      margin: 0;
+                      color: #333;
+                      font-size: 1.4rem;
+                  }
+                  
+                  .performance-indicator {
+                      padding: 6px 16px;
+                      border-radius: 20px;
+                      font-size: 0.85rem;
+                      font-weight: 600;
+                      margin-left: auto;
+                  }
+                  
+                  .performance-indicator.bad { background: #ffe6e6; color: #dc3545; }
+                  .performance-indicator.ok { background: #fff4e6; color: #ffc107; }
+                  .performance-indicator.good { background: #e6f3ff; color: #007bff; }
+                  .performance-indicator.excellent { background: #e6ffe6; color: #28a745; }
+                  
+                  .card-architecture {
+                      margin-bottom: 25px;
+                  }
+                  
+                  .arch-diagram {
+                      background: linear-gradient(135deg, #f8f9ff 0%, #e8f0ff 100%);
+                      border-radius: 12px;
+                      padding: 20px;
+                      border: 2px solid #e8f0ff;
+                  }
+                  
+                  .arch-box {
+                      display: flex;
+                      flex-direction: column;
+                      align-items: center;
+                      gap: 10px;
+                      margin-bottom: 15px;
+                  }
+                  
+                  .single-server, .postgres-server, .load-balanced, .cdn-cache {
+                      text-align: center;
+                  }
+                  
+                  .server-icon, .db-file, .db-server, .load-balancer, .cdn-layer, .cache-layer {
+                      background: white;
+                      padding: 10px 15px;
+                      border-radius: 8px;
+                      border: 2px solid #ddd;
+                      font-size: 0.9rem;
+                      font-weight: 600;
+                      margin: 5px;
+                  }
+                  
+                  .servers-row {
+                      display: flex;
+                      gap: 10px;
+                      justify-content: center;
+                      margin: 10px 0;
+                  }
+                  
+                  .server {
+                      background: white;
+                      padding: 8px 12px;
+                      border-radius: 6px;
+                      border: 2px solid #ddd;
+                      font-size: 0.8rem;
+                  }
+                  
+                  .arrow {
+                      font-size: 1.2rem;
+                      color: #667eea;
+                      font-weight: bold;
+                      margin: 5px 0;
+                  }
+                  
+                  .card-metrics {
+                      background: rgba(102, 126, 234, 0.05);
+                      border-radius: 12px;
+                      padding: 20px;
+                      margin-bottom: 25px;
+                  }
+                  
+                  .metric-row {
+                      display: flex;
+                      justify-content: space-between;
+                      align-items: center;
+                      padding: 8px 0;
+                      border-bottom: 1px solid rgba(102, 126, 234, 0.1);
+                  }
+                  
+                  .metric-row:last-child {
+                      border-bottom: none;
+                  }
+                  
+                  .metric-label {
+                      font-weight: 600;
+                      color: #555;
+                  }
+                  
+                  .metric-value {
+                      font-weight: bold;
+                      padding: 4px 12px;
+                      border-radius: 15px;
+                      font-size: 0.9rem;
+                  }
+                  
+                  .metric-value.bad { background: #ffe6e6; color: #dc3545; }
+                  .metric-value.ok { background: #fff4e6; color: #ffc107; }
+                  .metric-value.good { background: #e6f3ff; color: #007bff; }
+                  .metric-value.excellent { background: #e6ffe6; color: #28a745; }
+                  
+                  .card-problems, .card-improvements {
+                      background: rgba(255, 255, 255, 0.8);
+                      border-radius: 12px;
+                      padding: 20px;
+                  }
+                  
+                  .problems-title, .improvements-title {
+                      font-weight: bold;
+                      margin-bottom: 12px;
+                      color: #333;
+                  }
+                  
+                  .card-problems ul, .card-improvements ul {
+                      margin: 0;
+                      padding-left: 18px;
+                  }
+                  
+                  .card-problems li, .card-improvements li {
+                      margin-bottom: 6px;
+                      color: #555;
+                      line-height: 1.4;
+                  }
+                  
+                  .evolution-controls {
+                      display: flex;
+                      justify-content: space-between;
+                      align-items: center;
+                      margin-top: 30px;
+                      padding: 20px;
+                      background: rgba(102, 126, 234, 0.05);
+                      border-radius: 12px;
+                  }
+                  
+                  .prev-btn, .next-btn {
+                      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                      color: white;
+                      border: none;
+                      padding: 12px 24px;
+                      border-radius: 25px;
+                      font-weight: 600;
+                      cursor: pointer;
+                      transition: all 0.3s ease;
+                  }
+                  
+                  .prev-btn:hover, .next-btn:hover {
+                      transform: translateY(-2px);
+                      box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+                  }
+                  
+                  .prev-btn:disabled, .next-btn:disabled {
+                      opacity: 0.5;
+                      cursor: not-allowed;
+                      transform: none;
+                      box-shadow: none;
+                  }
+                  
+                  .stage-indicator {
+                      font-weight: 600;
+                      color: #667eea;
+                      font-size: 1rem;
                   }
                   
                   .timeline-container {
@@ -1912,115 +2174,212 @@ jobs:
                               </div>
                           </div>
                           
-                          <!-- Interactive Journey Timeline -->
-                          <div class="journey-timeline" id="journeyTimeline">
-                              <h3 style="text-align: center; color: #667eea; margin-bottom: 25px; font-size: 1.3em;">🗺️ Our Performance Journey - Click Each Stage!</h3>
-                              <div class="timeline-container">
-                                  <div class="timeline-path">
-                                      <svg width="100%" height="6" viewBox="0 0 1000 6" preserveAspectRatio="none">
-                                          <defs>
-                                              <linearGradient id="stageGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                                                  <stop offset="0%" stop-color="#dc3545" stop-opacity="1" id="gradientStop1"/>
-                                                  <stop offset="33%" stop-color="#ffc107" stop-opacity="1" id="gradientStop2"/>
-                                                  <stop offset="66%" stop-color="#007bff" stop-opacity="1" id="gradientStop3"/>
-                                                  <stop offset="100%" stop-color="#28a745" stop-opacity="1" id="gradientStop4"/>
-                                              </linearGradient>
-                                              <linearGradient id="progressGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                                                  <stop offset="0%" stop-color="rgba(102, 126, 234, 0.8)" stop-opacity="1"/>
-                                                  <stop offset="100%" stop-color="rgba(102, 126, 234, 0.3)" stop-opacity="1"/>
-                                              </linearGradient>
-                                          </defs>
-                                          <!-- Background line -->
-                                          <line x1="50" y1="3" x2="950" y2="3" stroke="#e0e6ed" stroke-width="4" stroke-linecap="round"/>
-                                          <!-- Animated progress line -->
-                                          <line x1="50" y1="3" x2="950" y2="3" stroke="url(#stageGradient)" stroke-width="6" stroke-linecap="round" 
-                                                id="progressLine" stroke-dasharray="900" stroke-dashoffset="900">
-                                              <animate attributeName="stroke-dashoffset" 
-                                                       values="900;0;900" 
-                                                       dur="12s" 
-                                                       repeatCount="indefinite"/>
-                                          </line>
-                                          <!-- Flow dots -->
-                                          <circle cx="50" cy="3" r="3" fill="#dc3545" opacity="0" id="dot1">
-                                              <animate attributeName="opacity" values="0;1;0" dur="12s" repeatCount="indefinite" begin="0s"/>
-                                          </circle>
-                                          <circle cx="350" cy="3" r="3" fill="#ffc107" opacity="0" id="dot2">
-                                              <animate attributeName="opacity" values="0;1;0" dur="12s" repeatCount="indefinite" begin="3s"/>
-                                          </circle>
-                                          <circle cx="650" cy="3" r="3" fill="#007bff" opacity="0" id="dot3">
-                                              <animate attributeName="opacity" values="0;1;0" dur="12s" repeatCount="indefinite" begin="6s"/>
-                                          </circle>
-                                          <circle cx="950" cy="3" r="3" fill="#28a745" opacity="0" id="dot4">
-                                              <animate attributeName="opacity" values="0;1;0" dur="12s" repeatCount="indefinite" begin="9s"/>
-                                          </circle>
-                                      </svg>
+                          <!-- Interactive Evolution Showcase -->
+                          <div class="evolution-showcase" id="evolutionShowcase">
+                              <h3 style="text-align: center; color: #667eea; margin-bottom: 30px; font-size: clamp(1.2rem, 3vw, 1.4rem);">🚀 System Evolution Journey</h3>
+                              
+                              <!-- Progress Stepper -->
+                              <div class="progress-stepper">
+                                  <div class="stepper-line"></div>
+                                  <div class="step step-1 active" data-stage="1">
+                                      <div class="step-circle">📁</div>
+                                      <span>SQLite</span>
+                                  </div>
+                                  <div class="step step-2" data-stage="2">
+                                      <div class="step-circle">🐘</div>
+                                      <span>PostgreSQL</span>
+                                  </div>
+                                  <div class="step step-3" data-stage="3">
+                                      <div class="step-circle">⚖️</div>
+                                      <span>Load Balancer</span>
+                                  </div>
+                                  <div class="step step-4" data-stage="4">
+                                      <div class="step-circle">🚀</div>
+                                      <span>Cache + CDN</span>
+                                  </div>
+                              </div>
+                              
+                              <!-- Interactive Stage Cards -->
+                              <div class="stage-cards-container">
+                                  <div class="stage-card active" data-stage="1">
+                                      <div class="card-header">
+                                          <div class="stage-badge stage-1-badge">Stage 1</div>
+                                          <h4>📁 SQLite Foundation</h4>
+                                          <div class="performance-indicator bad">Struggling</div>
+                                      </div>
+                                      <div class="card-architecture">
+                                          <div class="arch-diagram">
+                                              <div class="arch-box single-server">
+                                                  <div class="server-icon">🖥️</div>
+                                                  <span>Single Server</span>
+                                                  <div class="db-file">📄 SQLite</div>
+                                              </div>
+                                          </div>
+                                      </div>
+                                      <div class="card-metrics">
+                                          <div class="metric-row">
+                                              <span class="metric-label">Response Time:</span>
+                                              <span class="metric-value bad">89ms → timeout</span>
+                                          </div>
+                                          <div class="metric-row">
+                                              <span class="metric-label">Max Users:</span>
+                                              <span class="metric-value bad">~50 concurrent</span>
+                                          </div>
+                                          <div class="metric-row">
+                                              <span class="metric-label">Success Rate:</span>
+                                              <span class="metric-value bad">65% at scale</span>
+                                          </div>
+                                      </div>
+                                      <div class="card-problems">
+                                          <div class="problems-title">🚨 Major Issues:</div>
+                                          <ul>
+                                              <li>Database locks under concurrent access</li>
+                                              <li>No connection pooling</li>
+                                              <li>Single point of failure</li>
+                                          </ul>
+                                      </div>
                                   </div>
                                   
-                                  <div class="timeline-stages">
-                                      <div class="timeline-stage" data-stage="1" style="left: 5%;">
-                                          <div class="stage-marker stage-1">
-                                              <div class="stage-icon">📁</div>
-                                              <div class="stage-number">1</div>
-                                          </div>
-                                          <div class="stage-info">
-                                              <h4>SQLite Era</h4>
-                                              <p>Simple file database</p>
-                                              <div class="stage-stats">
-                                                  <span class="stat-bad">89ms → timeout</span>
-                                                  <span class="stat-bad">50 user limit</span>
+                                  <div class="stage-card" data-stage="2">
+                                      <div class="card-header">
+                                          <div class="stage-badge stage-2-badge">Stage 2</div>
+                                          <h4>🐘 PostgreSQL Upgrade</h4>
+                                          <div class="performance-indicator ok">Improving</div>
+                                      </div>
+                                      <div class="card-architecture">
+                                          <div class="arch-diagram">
+                                              <div class="arch-box postgres-server">
+                                                  <div class="server-icon">🖥️</div>
+                                                  <span>App Server</span>
+                                                  <div class="arrow">→</div>
+                                                  <div class="db-server">🐘 PostgreSQL</div>
                                               </div>
                                           </div>
                                       </div>
-                                      
-                                      <div class="timeline-stage" data-stage="2" style="left: 35%;">
-                                          <div class="stage-marker stage-2">
-                                              <div class="stage-icon">🐘</div>
-                                              <div class="stage-number">2</div>
+                                      <div class="card-metrics">
+                                          <div class="metric-row">
+                                              <span class="metric-label">Response Time:</span>
+                                              <span class="metric-value ok">45ms → 1.2s</span>
                                           </div>
-                                          <div class="stage-info">
-                                              <h4>PostgreSQL Upgrade</h4>
-                                              <p>Production database</p>
-                                              <div class="stage-stats">
-                                                  <span class="stat-ok">45ms → 1.5s</span>
-                                                  <span class="stat-ok">200 user capacity</span>
+                                          <div class="metric-row">
+                                              <span class="metric-label">Max Users:</span>
+                                              <span class="metric-value ok">~200 concurrent</span>
+                                          </div>
+                                          <div class="metric-row">
+                                              <span class="metric-label">Improvement:</span>
+                                              <span class="metric-value good">46% faster</span>
+                                          </div>
+                                      </div>
+                                      <div class="card-improvements">
+                                          <div class="improvements-title">✅ Key Improvements:</div>
+                                          <ul>
+                                              <li>ACID compliance & concurrent connections</li>
+                                              <li>Connection pooling implemented</li>
+                                              <li>Better query optimization</li>
+                                          </ul>
+                                      </div>
+                                  </div>
+                                  
+                                  <div class="stage-card" data-stage="3">
+                                      <div class="card-header">
+                                          <div class="stage-badge stage-3-badge">Stage 3</div>
+                                          <h4>⚖️ Load Balancer</h4>
+                                          <div class="performance-indicator good">Scaling</div>
+                                      </div>
+                                      <div class="card-architecture">
+                                          <div class="arch-diagram">
+                                              <div class="arch-box load-balanced">
+                                                  <div class="load-balancer">⚖️ Load Balancer</div>
+                                                  <div class="servers-row">
+                                                      <div class="server">🖥️</div>
+                                                      <div class="server">🖥️</div>
+                                                      <div class="server">🖥️</div>
+                                                  </div>
+                                                  <div class="arrow">↓</div>
+                                                  <div class="db-server">🐘 PostgreSQL</div>
                                               </div>
                                           </div>
                                       </div>
-                                      
-                                      <div class="timeline-stage" data-stage="3" style="left: 65%;">
-                                          <div class="stage-marker stage-3">
-                                              <div class="stage-icon">⚖️</div>
-                                              <div class="stage-number">3</div>
+                                      <div class="card-metrics">
+                                          <div class="metric-row">
+                                              <span class="metric-label">Response Time:</span>
+                                              <span class="metric-value good">12ms → 85ms</span>
                                           </div>
-                                          <div class="stage-info">
-                                              <h4>Load Balancer</h4>
-                                              <p>Horizontal scaling</p>
-                                              <div class="stage-stats">
-                                                  <span class="stat-good">12ms → 85ms</span>
-                                                  <span class="stat-good">2000 user capacity</span>
+                                          <div class="metric-row">
+                                              <span class="metric-label">Max Users:</span>
+                                              <span class="metric-value good">2000+ concurrent</span>
+                                          </div>
+                                          <div class="metric-row">
+                                              <span class="metric-label">Improvement:</span>
+                                              <span class="metric-value excellent">10x faster</span>
+                                          </div>
+                                      </div>
+                                      <div class="card-improvements">
+                                          <div class="improvements-title">🎯 Scaling Wins:</div>
+                                          <ul>
+                                              <li>Horizontal scaling with multiple servers</li>
+                                              <li>Traffic distribution & failover</li>
+                                              <li>Consistent sub-100ms performance</li>
+                                          </ul>
+                                      </div>
+                                  </div>
+                                  
+                                  <div class="stage-card" data-stage="4">
+                                      <div class="card-header">
+                                          <div class="stage-badge stage-4-badge">Stage 4</div>
+                                          <h4>🚀 Cache + CDN</h4>
+                                          <div class="performance-indicator excellent">Exceptional</div>
+                                      </div>
+                                      <div class="card-architecture">
+                                          <div class="arch-diagram">
+                                              <div class="arch-box cdn-cache">
+                                                  <div class="cdn-layer">🌐 Global CDN</div>
+                                                  <div class="cache-layer">💾 Redis Cache</div>
+                                                  <div class="load-balancer">⚖️ Load Balancer</div>
+                                                  <div class="servers-row">
+                                                      <div class="server">🖥️</div>
+                                                      <div class="server">🖥️</div>
+                                                      <div class="server">🖥️</div>
+                                                  </div>
+                                                  <div class="arrow">↓</div>
+                                                  <div class="db-server">🐘 PostgreSQL</div>
                                               </div>
                                           </div>
                                       </div>
-                                      
-                                      <div class="timeline-stage" data-stage="4" style="left: 95%;">
-                                          <div class="stage-marker stage-4">
-                                              <div class="stage-icon">🚀</div>
-                                              <div class="stage-number">4</div>
+                                      <div class="card-metrics">
+                                          <div class="metric-row">
+                                              <span class="metric-label">Response Time:</span>
+                                              <span class="metric-value excellent">8ms → 35ms</span>
                                           </div>
-                                          <div class="stage-info">
-                                              <h4>Cache + CDN</h4>
-                                              <p>Global edge caching</p>
-                                              <div class="stage-stats">
-                                                  <span class="stat-excellent">8ms → 35ms</span>
-                                                  <span class="stat-excellent">5000+ users</span>
-                                              </div>
+                                          <div class="metric-row">
+                                              <span class="metric-label">Max Users:</span>
+                                              <span class="metric-value excellent">5000+ concurrent</span>
                                           </div>
+                                          <div class="metric-row">
+                                              <span class="metric-label">Improvement:</span>
+                                              <span class="metric-value excellent">1000x faster!</span>
+                                          </div>
+                                      </div>
+                                      <div class="card-improvements">
+                                          <div class="improvements-title">🏆 Ultimate Performance:</div>
+                                          <ul>
+                                              <li>85% cache hit rate for instant responses</li>
+                                              <li>Global edge caching reduces latency</li>
+                                              <li>99.9% uptime SLA with redundancy</li>
+                                          </ul>
                                       </div>
                                   </div>
                               </div>
                               
-                              <!-- Detailed Stage Views -->
-                              <div class="stage-details" id="stageDetails">
+                              <!-- Navigation Controls -->
+                              <div class="evolution-controls">
+                                  <button class="prev-btn" onclick="navigateStage(-1)">← Previous</button>
+                                  <div class="stage-indicator">
+                                      <span id="currentStageText">Stage 1 of 4</span>
+                                  </div>
+                                  <button class="next-btn" onclick="navigateStage(1)">Next →</button>
+                              </div>
+                          </div>
                                   <div class="stage-detail" data-stage="1">
                                       <div class="detail-header">
                                           <span class="detail-icon">📁</span>
