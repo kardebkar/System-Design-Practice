@@ -863,7 +863,7 @@ jobs:
           
           window.navigateStage = function(direction) {
               const newStage = currentStage + direction;
-              if (newStage >= 1 && newStage <= 4) {
+              if (newStage >= 1 && newStage <= 8) {
                   showStage(newStage);
               }
           }
@@ -890,8 +890,8 @@ jobs:
               const stageText = document.getElementById('currentStageText');
               
               if (prevBtn) prevBtn.disabled = (stageNumber === 1);
-              if (nextBtn) nextBtn.disabled = (stageNumber === 4);
-              if (stageText) stageText.textContent = `Stage ${stageNumber} of 4`;
+              if (nextBtn) nextBtn.disabled = (stageNumber === 8);
+              if (stageText) stageText.textContent = `Stage ${stageNumber} of 8`;
               
               // Update the live metrics based on stage
               updateLiveMetrics(stageNumber);
@@ -1516,6 +1516,10 @@ jobs:
                   .stage-2-badge { background: #ffc107; color: #333; }
                   .stage-3-badge { background: #007bff; color: white; }
                   .stage-4-badge { background: #28a745; color: white; }
+                  .stage-5-badge { background: #6610f2; color: white; }
+                  .stage-6-badge { background: #fd7e14; color: white; }
+                  .stage-7-badge { background: #20c997; color: white; }
+                  .stage-8-badge { background: #e83e8c; color: white; }
                   
                   .card-header h4 {
                       margin: 0;
@@ -1555,11 +1559,11 @@ jobs:
                       margin-bottom: 15px;
                   }
                   
-                  .single-server, .postgres-server, .load-balanced, .cdn-cache {
+                  .single-server, .postgres-server, .load-balanced, .cdn-cache, .stateless-web, .multi-dc, .message-queue, .sharding {
                       text-align: center;
                   }
                   
-                  .server-icon, .db-file, .db-server, .load-balancer, .cdn-layer, .cache-layer {
+                  .server-icon, .db-file, .db-server, .load-balancer, .cdn-layer, .cache-layer, .session-store, .geo-dns, .dc, .replication-arrow, .db-cluster, .api-layer, .queue-system, .worker, .notification, .shard-router, .shard, .replica {
                       background: white;
                       padding: 10px 15px;
                       border-radius: 8px;
@@ -1567,6 +1571,18 @@ jobs:
                       font-size: 0.9rem;
                       font-weight: 600;
                       margin: 5px;
+                  }
+                  
+                  .data-centers, .workers-row, .shards-row, .replica-row {
+                      display: flex;
+                      gap: 8px;
+                      justify-content: center;
+                      margin: 10px 0;
+                  }
+                  
+                  .server.stateless {
+                      background: linear-gradient(135deg, #e3f2fd, #90caf9);
+                      border: 2px solid #2196f3;
                   }
                   
                   .servers-row {
@@ -1852,6 +1868,10 @@ jobs:
                   .stage-2-badge { background: rgba(255, 193, 7, 0.1); color: #e0a800; }
                   .stage-3-badge { background: rgba(0, 123, 255, 0.1); color: #007bff; }
                   .stage-4-badge { background: rgba(40, 167, 69, 0.1); color: #28a745; }
+                  .stage-5-badge { background: rgba(102, 16, 242, 0.1); color: #6610f2; }
+                  .stage-6-badge { background: rgba(253, 126, 20, 0.1); color: #fd7e14; }
+                  .stage-7-badge { background: rgba(32, 201, 151, 0.1); color: #20c997; }
+                  .stage-8-badge { background: rgba(232, 62, 140, 0.1); color: #e83e8c; }
                   
                   .detail-content {
                       display: grid;
@@ -2154,6 +2174,22 @@ jobs:
                                       <div class="step-circle">🚀</div>
                                       <span>Cache + CDN</span>
                                   </div>
+                                  <div class="step step-5" data-stage="5">
+                                      <div class="step-circle">🔄</div>
+                                      <span>Stateless Web</span>
+                                  </div>
+                                  <div class="step step-6" data-stage="6">
+                                      <div class="step-circle">🌍</div>
+                                      <span>Multi-Data Center</span>
+                                  </div>
+                                  <div class="step step-7" data-stage="7">
+                                      <div class="step-circle">📬</div>
+                                      <span>Message Queue</span>
+                                  </div>
+                                  <div class="step step-8" data-stage="8">
+                                      <div class="step-circle">🔀</div>
+                                      <span>Database Sharding</span>
+                                  </div>
                               </div>
                               
                               <!-- Interactive Stage Cards -->
@@ -2326,13 +2362,197 @@ jobs:
                                           </ul>
                                       </div>
                                   </div>
+                                  
+                                  <div class="stage-card" data-stage="5">
+                                      <div class="card-header">
+                                          <div class="stage-badge stage-5-badge">Stage 5</div>
+                                          <h4>🔄 Stateless Web Tier</h4>
+                                          <div class="performance-indicator excellent">Scalable</div>
+                                      </div>
+                                      <div class="card-architecture">
+                                          <div class="arch-diagram">
+                                              <div class="arch-box stateless-web">
+                                                  <div class="cdn-layer">🌐 Global CDN</div>
+                                                  <div class="cache-layer">💾 Redis Cache</div>
+                                                  <div class="load-balancer">⚖️ Load Balancer</div>
+                                                  <div class="servers-row">
+                                                      <div class="server stateless">🖥️ Stateless</div>
+                                                      <div class="server stateless">🖥️ Stateless</div>
+                                                      <div class="server stateless">🖥️ Stateless</div>
+                                                  </div>
+                                                  <div class="session-store">📦 Session Store</div>
+                                                  <div class="arrow">↓</div>
+                                                  <div class="db-server">🐘 PostgreSQL</div>
+                                              </div>
+                                          </div>
+                                      </div>
+                                      <div class="card-metrics">
+                                          <div class="metric-row">
+                                              <span class="metric-label">Response Time:</span>
+                                              <span class="metric-value excellent">6ms → 28ms</span>
+                                          </div>
+                                          <div class="metric-row">
+                                              <span class="metric-label">Auto-scaling:</span>
+                                              <span class="metric-value excellent">Unlimited servers</span>
+                                          </div>
+                                          <div class="metric-row">
+                                              <span class="metric-label">Session Storage:</span>
+                                              <span class="metric-value excellent">External NoSQL</span>
+                                          </div>
+                                      </div>
+                                      <div class="card-improvements">
+                                          <div class="improvements-title">🔄 Stateless Benefits:</div>
+                                          <ul>
+                                              <li>Servers can be added/removed dynamically</li>
+                                              <li>Session data moved to external storage</li>
+                                              <li>Better fault tolerance and recovery</li>
+                                          </ul>
+                                      </div>
+                                  </div>
+                                  
+                                  <div class="stage-card" data-stage="6">
+                                      <div class="card-header">
+                                          <div class="stage-badge stage-6-badge">Stage 6</div>
+                                          <h4>🌍 Multiple Data Centers</h4>
+                                          <div class="performance-indicator excellent">Global</div>
+                                      </div>
+                                      <div class="card-architecture">
+                                          <div class="arch-diagram">
+                                              <div class="arch-box multi-dc">
+                                                  <div class="geo-dns">🗺️ GeoDNS</div>
+                                                  <div class="data-centers">
+                                                      <div class="dc">🏢 US West</div>
+                                                      <div class="dc">🏢 US East</div>
+                                                      <div class="dc">🏢 Europe</div>
+                                                  </div>
+                                                  <div class="replication-arrow">↔️ Data Sync</div>
+                                                  <div class="db-cluster">🐘🐘🐘 DB Cluster</div>
+                                              </div>
+                                          </div>
+                                      </div>
+                                      <div class="card-metrics">
+                                          <div class="metric-row">
+                                              <span class="metric-label">Global Latency:</span>
+                                              <span class="metric-value excellent">< 50ms worldwide</span>
+                                          </div>
+                                          <div class="metric-row">
+                                              <span class="metric-label">Availability:</span>
+                                              <span class="metric-value excellent">99.99% uptime</span>
+                                          </div>
+                                          <div class="metric-row">
+                                              <span class="metric-label">Disaster Recovery:</span>
+                                              <span class="metric-value excellent">Multi-region backup</span>
+                                          </div>
+                                      </div>
+                                      <div class="card-improvements">
+                                          <div class="improvements-title">🌍 Global Scale:</div>
+                                          <ul>
+                                              <li>Geographic load balancing with GeoDNS</li>
+                                              <li>Regional data centers reduce latency</li>
+                                              <li>Cross-region replication for reliability</li>
+                                          </ul>
+                                      </div>
+                                  </div>
+                                  
+                                  <div class="stage-card" data-stage="7">
+                                      <div class="card-header">
+                                          <div class="stage-badge stage-7-badge">Stage 7</div>
+                                          <h4>📬 Message Queue</h4>
+                                          <div class="performance-indicator excellent">Async</div>
+                                      </div>
+                                      <div class="card-architecture">
+                                          <div class="arch-diagram">
+                                              <div class="arch-box message-queue">
+                                                  <div class="api-layer">🌐 API Gateway</div>
+                                                  <div class="queue-system">📬 Message Queue</div>
+                                                  <div class="workers-row">
+                                                      <div class="worker">⚡ Worker</div>
+                                                      <div class="worker">⚡ Worker</div>
+                                                      <div class="worker">⚡ Worker</div>
+                                                  </div>
+                                                  <div class="notification">🔔 Notification Service</div>
+                                              </div>
+                                          </div>
+                                      </div>
+                                      <div class="card-metrics">
+                                          <div class="metric-row">
+                                              <span class="metric-label">Queue Throughput:</span>
+                                              <span class="metric-value excellent">10K+ msgs/sec</span>
+                                          </div>
+                                          <div class="metric-row">
+                                              <span class="metric-label">Processing Time:</span>
+                                              <span class="metric-value excellent">Async background</span>
+                                          </div>
+                                          <div class="metric-row">
+                                              <span class="metric-label">Reliability:</span>
+                                              <span class="metric-value excellent">Guaranteed delivery</span>
+                                          </div>
+                                      </div>
+                                      <div class="card-improvements">
+                                          <div class="improvements-title">📬 Async Benefits:</div>
+                                          <ul>
+                                              <li>Heavy tasks processed asynchronously</li>
+                                              <li>Photo uploads & processing decoupled</li>
+                                              <li>Push notifications and user updates</li>
+                                          </ul>
+                                      </div>
+                                  </div>
+                                  
+                                  <div class="stage-card" data-stage="8">
+                                      <div class="card-header">
+                                          <div class="stage-badge stage-8-badge">Stage 8</div>
+                                          <h4>🔀 Database Sharding</h4>
+                                          <div class="performance-indicator excellent">Infinite Scale</div>
+                                      </div>
+                                      <div class="card-architecture">
+                                          <div class="arch-diagram">
+                                              <div class="arch-box sharding">
+                                                  <div class="shard-router">🧭 Consistent Hashing</div>
+                                                  <div class="shards-row">
+                                                      <div class="shard">📊 Shard 1</div>
+                                                      <div class="shard">📊 Shard 2</div>
+                                                      <div class="shard">📊 Shard 3</div>
+                                                      <div class="shard">📊 Shard N</div>
+                                                  </div>
+                                                  <div class="replica-row">
+                                                      <div class="replica">💾 Replica</div>
+                                                      <div class="replica">💾 Replica</div>
+                                                      <div class="replica">💾 Replica</div>
+                                                      <div class="replica">💾 Replica</div>
+                                                  </div>
+                                              </div>
+                                          </div>
+                                      </div>
+                                      <div class="card-metrics">
+                                          <div class="metric-row">
+                                              <span class="metric-label">Data Scale:</span>
+                                              <span class="metric-value excellent">Petabyte+ capacity</span>
+                                          </div>
+                                          <div class="metric-row">
+                                              <span class="metric-label">Query Performance:</span>
+                                              <span class="metric-value excellent">Linear scaling</span>
+                                          </div>
+                                          <div class="metric-row">
+                                              <span class="metric-label">Rebalancing:</span>
+                                              <span class="metric-value excellent">Automatic</span>
+                                          </div>
+                                      </div>
+                                      <div class="card-improvements">
+                                          <div class="improvements-title">🔀 Sharding Power:</div>
+                                          <ul>
+                                              <li>Horizontal partitioning by user ID</li>
+                                              <li>Consistent hashing for load distribution</li>
+                                              <li>Each shard handles millions of users</li>
+                                          </ul>
+                                      </div>
+                                  </div>
                               </div>
                               
                               <!-- Navigation Controls -->
                               <div class="evolution-controls">
                                   <button class="prev-btn" onclick="navigateStage(-1)">← Previous</button>
                                   <div class="stage-indicator">
-                                      <span id="currentStageText">Stage 1 of 4</span>
+                                      <span id="currentStageText">Stage 1 of 8</span>
                                   </div>
                                   <button class="next-btn" onclick="navigateStage(1)">Next →</button>
                               </div>
@@ -2511,6 +2731,199 @@ jobs:
                                                   <li>Global CDN with 200+ edge locations</li>
                                                   <li>Multi-tier caching strategy</li>
                                                   <li>Enterprise-grade 99.8% success rate</li>
+                                              </ul>
+                                          </div>
+                                      </div>
+                                  </div>
+                                  
+                                  <div class="stage-detail" data-stage="5">
+                                      <div class="detail-header">
+                                          <span class="detail-icon">🔄</span>
+                                          <h3>Stage 5: Stateless Web Tier</h3>
+                                          <span class="detail-badge stage-5-badge">Auto-scaling</span>
+                                      </div>
+                                      <div class="detail-content">
+                                          <div class="detail-architecture">
+                                              <div class="arch-component">
+                                                  <div class="component-box stateless-box">
+                                                      <span>🌐 Global CDN + Edge</span>
+                                                      <span>💾 Redis Session Store</span>
+                                                      <span>⚖️ Auto-scaling Load Balancer</span>
+                                                      <div class="instances">
+                                                          <span>🖥️ Stateless Server 1</span>
+                                                          <span>🖥️ Stateless Server 2</span>
+                                                          <span>🖥️ Stateless Server N</span>
+                                                      </div>
+                                                      <span>📦 External Session Storage</span>
+                                                      <span>🐘 PostgreSQL Master/Replica</span>
+                                                  </div>
+                                              </div>
+                                          </div>
+                                          <div class="detail-stats">
+                                              <div class="stat-item">
+                                                  <span class="stat-label">Response Time:</span>
+                                                  <span class="stat-value excellent">6ms → 28ms</span>
+                                              </div>
+                                              <div class="stat-item">
+                                                  <span class="stat-label">Auto-scaling:</span>
+                                                  <span class="stat-value excellent">Unlimited servers</span>
+                                              </div>
+                                              <div class="stat-item">
+                                                  <span class="stat-label">Architecture:</span>
+                                                  <span class="stat-value">Horizontally scalable</span>
+                                              </div>
+                                          </div>
+                                          <div class="detail-improvements">
+                                              <h5>🔄 Stateless Power:</h5>
+                                              <ul>
+                                                  <li>Server instances can be added/removed instantly</li>
+                                                  <li>Session data moved to external NoSQL store</li>
+                                                  <li>Better fault tolerance and crash recovery</li>
+                                                  <li>Auto-scaling based on traffic patterns</li>
+                                              </ul>
+                                          </div>
+                                      </div>
+                                  </div>
+                                  
+                                  <div class="stage-detail" data-stage="6">
+                                      <div class="detail-header">
+                                          <span class="detail-icon">🌍</span>
+                                          <h3>Stage 6: Multiple Data Centers</h3>
+                                          <span class="detail-badge stage-6-badge">Global Scale</span>
+                                      </div>
+                                      <div class="detail-content">
+                                          <div class="detail-architecture">
+                                              <div class="arch-component">
+                                                  <div class="component-box multi-dc-box">
+                                                      <span>🗺️ GeoDNS Traffic Routing</span>
+                                                      <div class="instances">
+                                                          <span>🏢 US West Data Center</span>
+                                                          <span>🏢 US East Data Center</span>
+                                                          <span>🏢 Europe Data Center</span>
+                                                      </div>
+                                                      <span>↔️ Cross-region Data Replication</span>
+                                                      <span>🔄 Master-Master DB Sync</span>
+                                                      <span>📱 Regional Load Balancers</span>
+                                                  </div>
+                                              </div>
+                                          </div>
+                                          <div class="detail-stats">
+                                              <div class="stat-item">
+                                                  <span class="stat-label">Global Latency:</span>
+                                                  <span class="stat-value excellent">< 50ms worldwide</span>
+                                              </div>
+                                              <div class="stat-item">
+                                                  <span class="stat-label">Availability:</span>
+                                                  <span class="stat-value excellent">99.99% uptime</span>
+                                              </div>
+                                              <div class="stat-item">
+                                                  <span class="stat-label">Architecture:</span>
+                                                  <span class="stat-value">Multi-region deployment</span>
+                                              </div>
+                                          </div>
+                                          <div class="detail-improvements">
+                                              <h5>🌍 Global Benefits:</h5>
+                                              <ul>
+                                                  <li>GeoDNS routes users to nearest data center</li>
+                                                  <li>Regional failover for disaster recovery</li>
+                                                  <li>Localized data compliance (GDPR, etc.)</li>
+                                                  <li>Reduced latency through geographic proximity</li>
+                                              </ul>
+                                          </div>
+                                      </div>
+                                  </div>
+                                  
+                                  <div class="stage-detail" data-stage="7">
+                                      <div class="detail-header">
+                                          <span class="detail-icon">📬</span>
+                                          <h3>Stage 7: Message Queue System</h3>
+                                          <span class="detail-badge stage-7-badge">Async Power</span>
+                                      </div>
+                                      <div class="detail-content">
+                                          <div class="detail-architecture">
+                                              <div class="arch-component">
+                                                  <div class="component-box message-queue-box">
+                                                      <span>🌐 API Gateway</span>
+                                                      <span>📬 Message Queue (SQS/RabbitMQ)</span>
+                                                      <div class="instances">
+                                                          <span>⚡ Photo Processing Worker</span>
+                                                          <span>⚡ Email Notification Worker</span>
+                                                          <span>⚡ Push Notification Worker</span>
+                                                      </div>
+                                                      <span>🔔 Notification Service</span>
+                                                      <span>📊 Dead Letter Queue</span>
+                                                  </div>
+                                              </div>
+                                          </div>
+                                          <div class="detail-stats">
+                                              <div class="stat-item">
+                                                  <span class="stat-label">Queue Throughput:</span>
+                                                  <span class="stat-value excellent">10K+ msgs/sec</span>
+                                              </div>
+                                              <div class="stat-item">
+                                                  <span class="stat-label">Processing:</span>
+                                                  <span class="stat-value excellent">Async background</span>
+                                              </div>
+                                              <div class="stat-item">
+                                                  <span class="stat-label">Architecture:</span>
+                                                  <span class="stat-value">Event-driven system</span>
+                                              </div>
+                                          </div>
+                                          <div class="detail-improvements">
+                                              <h5>📬 Async Benefits:</h5>
+                                              <ul>
+                                                  <li>Photo uploads processed asynchronously</li>
+                                                  <li>Heavy tasks don't block user interface</li>
+                                                  <li>Guaranteed message delivery with retries</li>
+                                                  <li>Decoupled microservices architecture</li>
+                                              </ul>
+                                          </div>
+                                      </div>
+                                  </div>
+                                  
+                                  <div class="stage-detail" data-stage="8">
+                                      <div class="detail-header">
+                                          <span class="detail-icon">🔀</span>
+                                          <h3>Stage 8: Database Sharding</h3>
+                                          <span class="detail-badge stage-8-badge">Infinite Scale</span>
+                                      </div>
+                                      <div class="detail-content">
+                                          <div class="detail-architecture">
+                                              <div class="arch-component">
+                                                  <div class="component-box sharding-box">
+                                                      <span>🧭 Consistent Hashing Router</span>
+                                                      <div class="instances">
+                                                          <span>📊 User Shard 1 (0-25M users)</span>
+                                                          <span>📊 User Shard 2 (25-50M users)</span>
+                                                          <span>📊 User Shard 3 (50-75M users)</span>
+                                                          <span>📊 User Shard N (75M+ users)</span>
+                                                      </div>
+                                                      <span>💾 Read Replicas per Shard</span>
+                                                      <span>🔄 Automatic Rebalancing</span>
+                                                  </div>
+                                              </div>
+                                          </div>
+                                          <div class="detail-stats">
+                                              <div class="stat-item">
+                                                  <span class="stat-label">Data Scale:</span>
+                                                  <span class="stat-value excellent">Petabyte+ capacity</span>
+                                              </div>
+                                              <div class="stat-item">
+                                                  <span class="stat-label">User Capacity:</span>
+                                                  <span class="stat-value excellent">1B+ users</span>
+                                              </div>
+                                              <div class="stat-item">
+                                                  <span class="stat-label">Architecture:</span>
+                                                  <span class="stat-value">Horizontally partitioned</span>
+                                              </div>
+                                          </div>
+                                          <div class="detail-improvements">
+                                              <h5>🔀 Sharding Power:</h5>
+                                              <ul>
+                                                  <li>Data partitioned by user ID hash</li>
+                                                  <li>Each shard handles millions of users independently</li>
+                                                  <li>Linear scaling with consistent performance</li>
+                                                  <li>Cross-shard queries minimized by design</li>
                                               </ul>
                                           </div>
                                       </div>
