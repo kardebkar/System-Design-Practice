@@ -101,9 +101,16 @@ jobs:
           
       - name: 📊 Generate 8-Stage Performance Dashboard
         run: |
+          # Ensure docs directory exists
+          mkdir -p docs
+          
           TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
           BUILD_NUMBER=${GITHUB_RUN_NUMBER:-"demo"}
           COMMIT_SHA=${GITHUB_SHA:-"latest"}
+          
+          echo "🚀 Creating 8-stage dashboard with timestamp: $TIMESTAMP"
+          echo "📊 Build number: $BUILD_NUMBER"
+          echo "🔧 Commit SHA: ${COMMIT_SHA:0:7}"
           
           cat > docs/index.html << 'EOF'
 <!DOCTYPE html>
@@ -746,9 +753,17 @@ jobs:
 EOF
 
           # Replace placeholders with actual values
-          sed -i "s/BUILD_NUMBER_PLACEHOLDER/$BUILD_NUMBER/g" docs/index.html
-          sed -i "s/COMMIT_PLACEHOLDER/${GITHUB_SHA:0:7}/g" docs/index.html  
-          sed -i "s/TIMESTAMP_PLACEHOLDER/$TIMESTAMP/g" docs/index.html
+          echo "🔧 Replacing placeholders..."
+          sed -i.bak "s/BUILD_NUMBER_PLACEHOLDER/$BUILD_NUMBER/g" docs/index.html || echo "Build number replacement failed"
+          sed -i.bak "s/COMMIT_PLACEHOLDER/${GITHUB_SHA:0:7}/g" docs/index.html || echo "Commit replacement failed"
+          sed -i.bak "s/TIMESTAMP_PLACEHOLDER/$TIMESTAMP/g" docs/index.html || echo "Timestamp replacement failed"
+          
+          # Clean up backup files
+          rm -f docs/index.html.bak
+          
+          # Verify the file was created correctly
+          echo "📊 Generated dashboard file size: $(wc -c < docs/index.html) bytes"
+          echo "✅ Dashboard generation complete!"
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
