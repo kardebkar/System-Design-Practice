@@ -1,0 +1,1074 @@
+{
+  "testStart": "2025-08-09T16:16:54.379Z",
+  "testSuite": "MiniGram 8-Stage Evolution",
+  "stages": {
+    "1": {
+      "stageName": "SQLite Foundation",
+      "architecture": "Single Express.js server with SQLite file database",
+      "performanceData": {
+        "results": {
+          "10": {
+            "response": 100,
+            "status": "success",
+            "successRate": 100
+          },
+          "50": {
+            "response": 648,
+            "status": "success",
+            "successRate": 100
+          },
+          "100": {
+            "response": 1779,
+            "status": "success",
+            "successRate": 100
+          }
+        },
+        "bestResponse": 100,
+        "maxUsers": 100,
+        "architecture": "Single Express.js server with SQLite file database",
+        "keyMetrics": {
+          "avgResponseTime": 842,
+          "minResponseTime": 100,
+          "maxResponseTime": 1779,
+          "maxConcurrentUsers": 100,
+          "reliability": "high"
+        }
+      },
+      "testTimestamp": "2025-08-09T16:16:54.382Z",
+      "improvements": [
+        "File-based database",
+        "Simple single-server architecture"
+      ],
+      "limitations": [
+        "Database locking under load",
+        "Single point of failure",
+        "No connection pooling"
+      ]
+    },
+    "2": {
+      "stageName": "PostgreSQL Upgrade",
+      "architecture": "Express.js server with dedicated PostgreSQL database",
+      "performanceData": {
+        "results": {
+          "10": {
+            "response": 45,
+            "status": "success",
+            "successRate": 100
+          },
+          "50": {
+            "response": 166,
+            "status": "success",
+            "successRate": 100
+          },
+          "100": {
+            "response": 255,
+            "status": "success",
+            "successRate": 100
+          },
+          "200": {
+            "response": 393,
+            "status": "success",
+            "successRate": 100
+          }
+        },
+        "bestResponse": 45,
+        "maxUsers": 200,
+        "architecture": "Express.js server with dedicated PostgreSQL database",
+        "keyMetrics": {
+          "avgResponseTime": 215,
+          "minResponseTime": 45,
+          "maxResponseTime": 393,
+          "maxConcurrentUsers": 200,
+          "reliability": "high"
+        }
+      },
+      "testTimestamp": "2025-08-09T16:16:54.382Z",
+      "improvements": [
+        "ACID compliance",
+        "Connection pooling",
+        "Better concurrency"
+      ],
+      "limitations": [
+        "Single database server",
+        "Limited to vertical scaling",
+        "No caching layer"
+      ]
+    },
+    "3": {
+      "stageName": "Load Balancer",
+      "architecture": "Load-balanced Express.js servers with PostgreSQL",
+      "performanceData": {
+        "results": {
+          "10": {
+            "response": 11,
+            "status": "success",
+            "successRate": 100
+          },
+          "50": {
+            "response": 16,
+            "status": "success",
+            "successRate": 100
+          },
+          "100": {
+            "response": 20,
+            "status": "success",
+            "successRate": 100
+          },
+          "500": {
+            "response": 32,
+            "status": "success",
+            "successRate": 100
+          },
+          "1000": {
+            "response": 38,
+            "status": "success",
+            "successRate": 100
+          },
+          "2000": {
+            "response": 42,
+            "status": "success",
+            "successRate": 100
+          }
+        },
+        "bestResponse": 11,
+        "maxUsers": 2000,
+        "architecture": "Load-balanced Express.js servers with PostgreSQL",
+        "keyMetrics": {
+          "avgResponseTime": 27,
+          "minResponseTime": 11,
+          "maxResponseTime": 42,
+          "maxConcurrentUsers": 2000,
+          "reliability": "high"
+        }
+      },
+      "testTimestamp": "2025-08-09T16:16:54.382Z",
+      "improvements": [
+        "Horizontal scaling",
+        "Load distribution",
+        "Fault tolerance"
+      ],
+      "limitations": [
+        "Database still bottleneck",
+        "No edge caching",
+        "Regional limitations"
+      ]
+    },
+    "4": {
+      "stageName": "Cache + CDN",
+      "architecture": "Load-balanced servers + Redis cache + CDN integration",
+      "performanceData": {
+        "results": {
+          "10": {
+            "response": 7,
+            "status": "success",
+            "successRate": 100
+          },
+          "50": {
+            "response": 8,
+            "status": "success",
+            "successRate": 100
+          },
+          "100": {
+            "response": 9,
+            "status": "success",
+            "successRate": 100
+          },
+          "500": {
+            "response": 11,
+            "status": "success",
+            "successRate": 100
+          },
+          "1000": {
+            "response": 10,
+            "status": "success",
+            "successRate": 100
+          },
+          "2000": {
+            "response": 13,
+            "status": "success",
+            "successRate": 100
+          },
+          "5000": {
+            "response": 12,
+            "status": "success",
+            "successRate": 71
+          }
+        },
+        "bestResponse": 7,
+        "maxUsers": 5000,
+        "architecture": "Load-balanced servers + Redis cache + CDN integration",
+        "keyMetrics": {
+          "avgResponseTime": 10,
+          "minResponseTime": 7,
+          "maxResponseTime": 13,
+          "maxConcurrentUsers": 5000,
+          "reliability": "high"
+        }
+      },
+      "testTimestamp": "2025-08-09T16:16:54.383Z",
+      "improvements": [
+        "85% cache hit rate",
+        "CDN edge caching",
+        "99.9% uptime SLA"
+      ],
+      "limitations": [
+        "Still regional deployment",
+        "Limited auto-scaling",
+        "Session stickiness"
+      ]
+    },
+    "5": {
+      "stageName": "Stateless Web Tier",
+      "architecture": "Stateless servers with external Redis session storage",
+      "performanceData": {
+        "results": {
+          "10": {
+            "response": 5,
+            "status": "success",
+            "successRate": 100
+          },
+          "50": {
+            "response": 6,
+            "status": "success",
+            "successRate": 100
+          },
+          "100": {
+            "response": 6,
+            "status": "success",
+            "successRate": 100
+          },
+          "500": {
+            "response": 7,
+            "status": "success",
+            "successRate": 100
+          },
+          "1000": {
+            "response": 9,
+            "status": "success",
+            "successRate": 100
+          },
+          "2000": {
+            "response": 7,
+            "status": "success",
+            "successRate": 100
+          },
+          "5000": {
+            "response": 9,
+            "status": "success",
+            "successRate": 100
+          },
+          "10000": {
+            "response": 7,
+            "status": "success",
+            "successRate": 100
+          }
+        },
+        "bestResponse": 5,
+        "maxUsers": 10000,
+        "architecture": "Stateless servers with external Redis session storage",
+        "keyMetrics": {
+          "avgResponseTime": 7,
+          "minResponseTime": 5,
+          "maxResponseTime": 9,
+          "maxConcurrentUsers": 10000,
+          "reliability": "high"
+        }
+      },
+      "testTimestamp": "2025-08-09T16:16:54.383Z",
+      "improvements": [
+        "Auto-scaling servers",
+        "External session storage",
+        "Better fault recovery"
+      ],
+      "limitations": [
+        "Regional data center dependency",
+        "Limited global optimization"
+      ]
+    },
+    "6": {
+      "stageName": "Multi Data Center",
+      "architecture": "Multi-region deployment with GeoDNS routing",
+      "performanceData": {
+        "results": {
+          "10": {
+            "response": 4,
+            "status": "success",
+            "successRate": 100
+          },
+          "50": {
+            "response": 4,
+            "status": "success",
+            "successRate": 100
+          },
+          "100": {
+            "response": 4,
+            "status": "success",
+            "successRate": 100
+          },
+          "500": {
+            "response": 5,
+            "status": "success",
+            "successRate": 100
+          },
+          "1000": {
+            "response": 3,
+            "status": "success",
+            "successRate": 100
+          },
+          "2000": {
+            "response": 4,
+            "status": "success",
+            "successRate": 100
+          },
+          "5000": {
+            "response": 6,
+            "status": "success",
+            "successRate": 100
+          },
+          "10000": {
+            "response": 4,
+            "status": "success",
+            "successRate": 100
+          },
+          "15000": {
+            "response": 4,
+            "status": "success",
+            "successRate": 70
+          }
+        },
+        "bestResponse": 3,
+        "maxUsers": 15000,
+        "architecture": "Multi-region deployment with GeoDNS routing",
+        "keyMetrics": {
+          "avgResponseTime": 4,
+          "minResponseTime": 3,
+          "maxResponseTime": 6,
+          "maxConcurrentUsers": 15000,
+          "reliability": "high"
+        }
+      },
+      "testTimestamp": "2025-08-09T16:16:54.383Z",
+      "improvements": [
+        "Global latency < 50ms",
+        "Regional failover",
+        "GeoDNS routing"
+      ],
+      "limitations": [
+        "Cross-region latency for writes",
+        "Complex data consistency"
+      ]
+    },
+    "7": {
+      "stageName": "Message Queue",
+      "architecture": "Microservices with Redis/RabbitMQ message queues",
+      "performanceData": {
+        "results": {
+          "10": {
+            "response": 3,
+            "status": "success",
+            "successRate": 100
+          },
+          "50": {
+            "response": 3,
+            "status": "success",
+            "successRate": 100
+          },
+          "100": {
+            "response": 3,
+            "status": "success",
+            "successRate": 100
+          },
+          "500": {
+            "response": 3,
+            "status": "success",
+            "successRate": 100
+          },
+          "1000": {
+            "response": 3,
+            "status": "success",
+            "successRate": 100
+          },
+          "2000": {
+            "response": 3,
+            "status": "success",
+            "successRate": 100
+          },
+          "5000": {
+            "response": 3,
+            "status": "success",
+            "successRate": 100
+          },
+          "10000": {
+            "response": 3,
+            "status": "success",
+            "successRate": 100
+          },
+          "15000": {
+            "response": 3,
+            "status": "success",
+            "successRate": 100
+          },
+          "25000": {
+            "response": 3,
+            "status": "success",
+            "successRate": 71
+          }
+        },
+        "bestResponse": 3,
+        "maxUsers": 25000,
+        "architecture": "Microservices with Redis/RabbitMQ message queues",
+        "keyMetrics": {
+          "avgResponseTime": 3,
+          "minResponseTime": 3,
+          "maxResponseTime": 3,
+          "maxConcurrentUsers": 25000,
+          "reliability": "high"
+        }
+      },
+      "testTimestamp": "2025-08-09T16:16:54.383Z",
+      "improvements": [
+        "Async background processing",
+        "Decoupled microservices",
+        "Message reliability"
+      ],
+      "limitations": [
+        "Message queue complexity",
+        "Eventual consistency challenges"
+      ]
+    },
+    "8": {
+      "stageName": "Database Sharding",
+      "architecture": "Horizontally sharded databases with consistent hashing",
+      "performanceData": {
+        "results": {
+          "10": {
+            "response": 2,
+            "status": "success",
+            "successRate": 100
+          },
+          "50": {
+            "response": 2,
+            "status": "success",
+            "successRate": 100
+          },
+          "100": {
+            "response": 2,
+            "status": "success",
+            "successRate": 100
+          },
+          "500": {
+            "response": 2,
+            "status": "success",
+            "successRate": 100
+          },
+          "1000": {
+            "response": 2,
+            "status": "success",
+            "successRate": 100
+          },
+          "2000": {
+            "response": 2,
+            "status": "success",
+            "successRate": 100
+          },
+          "5000": {
+            "response": 2,
+            "status": "success",
+            "successRate": 100
+          },
+          "10000": {
+            "response": 2,
+            "status": "success",
+            "successRate": 100
+          },
+          "25000": {
+            "response": 2,
+            "status": "success",
+            "successRate": 100
+          },
+          "50000": {
+            "response": 2,
+            "status": "success",
+            "successRate": 100
+          },
+          "100000": {
+            "response": 2,
+            "status": "success",
+            "successRate": 100
+          }
+        },
+        "bestResponse": 2,
+        "maxUsers": 100000,
+        "architecture": "Horizontally sharded databases with consistent hashing",
+        "keyMetrics": {
+          "avgResponseTime": 2,
+          "minResponseTime": 2,
+          "maxResponseTime": 2,
+          "maxConcurrentUsers": 100000,
+          "reliability": "high"
+        }
+      },
+      "testTimestamp": "2025-08-09T16:16:54.383Z",
+      "improvements": [
+        "Linear horizontal scaling",
+        "Petabyte+ capacity",
+        "Consistent hashing"
+      ],
+      "limitations": [
+        "Cross-shard query complexity",
+        "Data rebalancing overhead"
+      ]
+    }
+  },
+  "summary": {},
+  "improvements": {
+    "2": {
+      "responseTimeImprovement": "55%",
+      "userCapacityMultiplier": "2x",
+      "absoluteImprovement": {
+        "from": "100ms",
+        "to": "45ms",
+        "userCapacity": {
+          "from": 100,
+          "to": 200
+        }
+      }
+    },
+    "3": {
+      "responseTimeImprovement": "76%",
+      "userCapacityMultiplier": "10x",
+      "absoluteImprovement": {
+        "from": "45ms",
+        "to": "11ms",
+        "userCapacity": {
+          "from": 200,
+          "to": 2000
+        }
+      }
+    },
+    "4": {
+      "responseTimeImprovement": "36%",
+      "userCapacityMultiplier": "2.5x",
+      "absoluteImprovement": {
+        "from": "11ms",
+        "to": "7ms",
+        "userCapacity": {
+          "from": 2000,
+          "to": 5000
+        }
+      }
+    },
+    "5": {
+      "responseTimeImprovement": "29%",
+      "userCapacityMultiplier": "2x",
+      "absoluteImprovement": {
+        "from": "7ms",
+        "to": "5ms",
+        "userCapacity": {
+          "from": 5000,
+          "to": 10000
+        }
+      }
+    },
+    "6": {
+      "responseTimeImprovement": "40%",
+      "userCapacityMultiplier": "1.5x",
+      "absoluteImprovement": {
+        "from": "5ms",
+        "to": "3ms",
+        "userCapacity": {
+          "from": 10000,
+          "to": 15000
+        }
+      }
+    },
+    "7": {
+      "responseTimeImprovement": "0%",
+      "userCapacityMultiplier": "1.7x",
+      "absoluteImprovement": {
+        "from": "3ms",
+        "to": "3ms",
+        "userCapacity": {
+          "from": 15000,
+          "to": 25000
+        }
+      }
+    },
+    "8": {
+      "responseTimeImprovement": "33%",
+      "userCapacityMultiplier": "4x",
+      "absoluteImprovement": {
+        "from": "3ms",
+        "to": "2ms",
+        "userCapacity": {
+          "from": 25000,
+          "to": 100000
+        }
+      }
+    }
+  },
+  "dashboardData": {
+    "lastUpdated": "2025-08-09T16:16:54.383Z",
+    "stages": {
+      "1": {
+        "name": "SQLite Foundation",
+        "architecture": "Single Express.js server with SQLite file database",
+        "performance": {
+          "responseTime": 100,
+          "maxUsers": 100,
+          "successRate": 100,
+          "reliability": "high"
+        },
+        "metrics": [
+          {
+            "users": 10,
+            "response": 100,
+            "status": "success"
+          },
+          {
+            "users": 50,
+            "response": 648,
+            "status": "success"
+          },
+          {
+            "users": 100,
+            "response": 1779,
+            "status": "success"
+          },
+          {
+            "users": 500,
+            "response": null,
+            "status": "timeout"
+          },
+          {
+            "users": 1000,
+            "response": null,
+            "status": "timeout"
+          },
+          {
+            "users": 2000,
+            "response": null,
+            "status": "timeout"
+          },
+          {
+            "users": 5000,
+            "response": null,
+            "status": "timeout"
+          }
+        ],
+        "improvements": [
+          "File-based database",
+          "Simple single-server architecture"
+        ],
+        "limitations": [
+          "Database locking under load",
+          "Single point of failure",
+          "No connection pooling"
+        ]
+      },
+      "2": {
+        "name": "PostgreSQL Upgrade",
+        "architecture": "Express.js server with dedicated PostgreSQL database",
+        "performance": {
+          "responseTime": 45,
+          "maxUsers": 200,
+          "successRate": 100,
+          "reliability": "high"
+        },
+        "metrics": [
+          {
+            "users": 10,
+            "response": 45,
+            "status": "success"
+          },
+          {
+            "users": 50,
+            "response": 166,
+            "status": "success"
+          },
+          {
+            "users": 100,
+            "response": 255,
+            "status": "success"
+          },
+          {
+            "users": 500,
+            "response": null,
+            "status": "timeout"
+          },
+          {
+            "users": 1000,
+            "response": null,
+            "status": "timeout"
+          },
+          {
+            "users": 2000,
+            "response": null,
+            "status": "timeout"
+          },
+          {
+            "users": 5000,
+            "response": null,
+            "status": "timeout"
+          }
+        ],
+        "improvements": [
+          "ACID compliance",
+          "Connection pooling",
+          "Better concurrency"
+        ],
+        "limitations": [
+          "Single database server",
+          "Limited to vertical scaling",
+          "No caching layer"
+        ]
+      },
+      "3": {
+        "name": "Load Balancer",
+        "architecture": "Load-balanced Express.js servers with PostgreSQL",
+        "performance": {
+          "responseTime": 11,
+          "maxUsers": 2000,
+          "successRate": 100,
+          "reliability": "high"
+        },
+        "metrics": [
+          {
+            "users": 10,
+            "response": 11,
+            "status": "success"
+          },
+          {
+            "users": 50,
+            "response": 16,
+            "status": "success"
+          },
+          {
+            "users": 100,
+            "response": 20,
+            "status": "success"
+          },
+          {
+            "users": 500,
+            "response": 32,
+            "status": "success"
+          },
+          {
+            "users": 1000,
+            "response": 38,
+            "status": "success"
+          },
+          {
+            "users": 2000,
+            "response": 42,
+            "status": "success"
+          },
+          {
+            "users": 5000,
+            "response": null,
+            "status": "timeout"
+          }
+        ],
+        "improvements": [
+          "Horizontal scaling",
+          "Load distribution",
+          "Fault tolerance"
+        ],
+        "limitations": [
+          "Database still bottleneck",
+          "No edge caching",
+          "Regional limitations"
+        ]
+      },
+      "4": {
+        "name": "Cache + CDN",
+        "architecture": "Load-balanced servers + Redis cache + CDN integration",
+        "performance": {
+          "responseTime": 7,
+          "maxUsers": 5000,
+          "successRate": 96,
+          "reliability": "high"
+        },
+        "metrics": [
+          {
+            "users": 10,
+            "response": 7,
+            "status": "success"
+          },
+          {
+            "users": 50,
+            "response": 8,
+            "status": "success"
+          },
+          {
+            "users": 100,
+            "response": 9,
+            "status": "success"
+          },
+          {
+            "users": 500,
+            "response": 11,
+            "status": "success"
+          },
+          {
+            "users": 1000,
+            "response": 10,
+            "status": "success"
+          },
+          {
+            "users": 2000,
+            "response": 13,
+            "status": "success"
+          },
+          {
+            "users": 5000,
+            "response": 12,
+            "status": "success"
+          }
+        ],
+        "improvements": [
+          "85% cache hit rate",
+          "CDN edge caching",
+          "99.9% uptime SLA"
+        ],
+        "limitations": [
+          "Still regional deployment",
+          "Limited auto-scaling",
+          "Session stickiness"
+        ]
+      },
+      "5": {
+        "name": "Stateless Web Tier",
+        "architecture": "Stateless servers with external Redis session storage",
+        "performance": {
+          "responseTime": 5,
+          "maxUsers": 10000,
+          "successRate": 100,
+          "reliability": "high"
+        },
+        "metrics": [
+          {
+            "users": 10,
+            "response": 5,
+            "status": "success"
+          },
+          {
+            "users": 50,
+            "response": 6,
+            "status": "success"
+          },
+          {
+            "users": 100,
+            "response": 6,
+            "status": "success"
+          },
+          {
+            "users": 500,
+            "response": 7,
+            "status": "success"
+          },
+          {
+            "users": 1000,
+            "response": 9,
+            "status": "success"
+          },
+          {
+            "users": 2000,
+            "response": 7,
+            "status": "success"
+          },
+          {
+            "users": 5000,
+            "response": 9,
+            "status": "success"
+          }
+        ],
+        "improvements": [
+          "Auto-scaling servers",
+          "External session storage",
+          "Better fault recovery"
+        ],
+        "limitations": [
+          "Regional data center dependency",
+          "Limited global optimization"
+        ]
+      },
+      "6": {
+        "name": "Multi Data Center",
+        "architecture": "Multi-region deployment with GeoDNS routing",
+        "performance": {
+          "responseTime": 3,
+          "maxUsers": 15000,
+          "successRate": 97,
+          "reliability": "high"
+        },
+        "metrics": [
+          {
+            "users": 10,
+            "response": 4,
+            "status": "success"
+          },
+          {
+            "users": 50,
+            "response": 4,
+            "status": "success"
+          },
+          {
+            "users": 100,
+            "response": 4,
+            "status": "success"
+          },
+          {
+            "users": 500,
+            "response": 5,
+            "status": "success"
+          },
+          {
+            "users": 1000,
+            "response": 3,
+            "status": "success"
+          },
+          {
+            "users": 2000,
+            "response": 4,
+            "status": "success"
+          },
+          {
+            "users": 5000,
+            "response": 6,
+            "status": "success"
+          }
+        ],
+        "improvements": [
+          "Global latency < 50ms",
+          "Regional failover",
+          "GeoDNS routing"
+        ],
+        "limitations": [
+          "Cross-region latency for writes",
+          "Complex data consistency"
+        ]
+      },
+      "7": {
+        "name": "Message Queue",
+        "architecture": "Microservices with Redis/RabbitMQ message queues",
+        "performance": {
+          "responseTime": 3,
+          "maxUsers": 25000,
+          "successRate": 97,
+          "reliability": "high"
+        },
+        "metrics": [
+          {
+            "users": 10,
+            "response": 3,
+            "status": "success"
+          },
+          {
+            "users": 50,
+            "response": 3,
+            "status": "success"
+          },
+          {
+            "users": 100,
+            "response": 3,
+            "status": "success"
+          },
+          {
+            "users": 500,
+            "response": 3,
+            "status": "success"
+          },
+          {
+            "users": 1000,
+            "response": 3,
+            "status": "success"
+          },
+          {
+            "users": 2000,
+            "response": 3,
+            "status": "success"
+          },
+          {
+            "users": 5000,
+            "response": 3,
+            "status": "success"
+          }
+        ],
+        "improvements": [
+          "Async background processing",
+          "Decoupled microservices",
+          "Message reliability"
+        ],
+        "limitations": [
+          "Message queue complexity",
+          "Eventual consistency challenges"
+        ]
+      },
+      "8": {
+        "name": "Database Sharding",
+        "architecture": "Horizontally sharded databases with consistent hashing",
+        "performance": {
+          "responseTime": 2,
+          "maxUsers": 100000,
+          "successRate": 100,
+          "reliability": "high"
+        },
+        "metrics": [
+          {
+            "users": 10,
+            "response": 2,
+            "status": "success"
+          },
+          {
+            "users": 50,
+            "response": 2,
+            "status": "success"
+          },
+          {
+            "users": 100,
+            "response": 2,
+            "status": "success"
+          },
+          {
+            "users": 500,
+            "response": 2,
+            "status": "success"
+          },
+          {
+            "users": 1000,
+            "response": 2,
+            "status": "success"
+          },
+          {
+            "users": 2000,
+            "response": 2,
+            "status": "success"
+          },
+          {
+            "users": 5000,
+            "response": 2,
+            "status": "success"
+          }
+        ],
+        "improvements": [
+          "Linear horizontal scaling",
+          "Petabyte+ capacity",
+          "Consistent hashing"
+        ],
+        "limitations": [
+          "Cross-shard query complexity",
+          "Data rebalancing overhead"
+        ]
+      }
+    },
+    "overallProgress": {
+      "totalImprovement": "98% faster",
+      "bestConfiguration": {
+        "stage": 8,
+        "name": "Database Sharding",
+        "score": 600
+      }
+    }
+  }
+}
