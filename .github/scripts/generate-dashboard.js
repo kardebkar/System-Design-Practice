@@ -32,6 +32,18 @@ const html = `<!DOCTYPE html>
         .header h1 { font-size: 3.5rem; margin-bottom: 15px; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); }
         .header p { font-size: 1.4rem; margin-bottom: 20px; opacity: 0.95; }
         .badges { display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; margin-top: 20px; }
+        .chapters-nav {
+            display: flex; justify-content: center; gap: 20px; margin: 30px 0;
+            flex-wrap: wrap;
+        }
+        .chapter-btn {
+            background: rgba(255,255,255,0.2); color: white; border: none;
+            padding: 15px 30px; border-radius: 25px; font-size: 16px; font-weight: 600;
+            cursor: pointer; transition: all 0.3s ease; backdrop-filter: blur(10px);
+            text-decoration: none; display: inline-block;
+        }
+        .chapter-btn:hover { background: rgba(255,255,255,0.3); transform: translateY(-2px); }
+        .chapter-btn.active { background: rgba(255,255,255,0.4); }
         .badge {
             background: rgba(255,255,255,0.9); padding: 12px 24px; border-radius: 25px;
             color: #333; font-weight: 600; font-size: 1rem;
@@ -104,9 +116,14 @@ const html = `<!DOCTYPE html>
 <body>
     <div class="container">
         <div class="header">
-            <h1>🚀 MiniGram: 8-Stage Evolution</h1>
-            <p>Complete system design journey from SQLite to Database Sharding</p>
-            <p><strong>98% Performance Improvement • 1000x User Capacity</strong></p>
+            <h1>System Design Interview Practice</h1>
+            <p>Interactive learning platform following Alex Xu's methodology</p>
+            <p><strong>Complete chapters with hands-on examples and tools</strong></p>
+            <div class="chapters-nav">
+                <a href="index.html" class="chapter-btn active">Chapter 1: System Evolution</a>
+                <a href="../chapter-2-estimation/dashboard/index.html" class="chapter-btn">Chapter 2: Estimation</a>
+                <span class="chapter-btn" style="opacity: 0.6;">Chapter 3: Coming Soon</span>
+            </div>
             <div class="badges">
                 <div class="badge">✅ All 8 Stages Tested</div>
                 <div class="badge">📈 Real Performance Data</div>
@@ -114,6 +131,13 @@ const html = `<!DOCTYPE html>
                 <div class="badge">⚡ 2ms Response Time</div>
             </div>
         </div>
+        
+        <!-- Chapter 1 Content -->
+        <div class="chapter-section">
+            <h2 style="color: white; text-align: center; margin-bottom: 30px; font-size: 2.5rem;">Chapter 1: MiniGram System Evolution</h2>
+            <p style="color: white; text-align: center; margin-bottom: 40px; font-size: 1.2rem; opacity: 0.9;">
+                Complete system design journey from SQLite to Database Sharding with 98% performance improvement
+            </p>
         
         <div class="evolution-grid">
             <div class="stage-card stage-1" onclick="toggleStageDetails(1)">
@@ -688,6 +712,7 @@ Client → Query Router → [Shard1, Shard2, Shard3, ...] → Results Aggregator
             }
         });
     </script>
+        </div> <!-- End Chapter 1 Content -->
 </body>
 </html>`;
 
