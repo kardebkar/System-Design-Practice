@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Latency Numbers Every Programmer Should Know</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh; padding: 20px; color: #333;
+        }
+        .container { max-width: 1400px; margin: 0 auto; }
+        .header {
+            text-align: center; color: white; margin-bottom: 40px; padding: 40px 20px;
+            background: rgba(255,255,255,0.1); border-radius: 20px; backdrop-filter: blur(20px);
+        }
+        .header h1 { font-size: 2.5rem; margin-bottom: 15px; }
+        .benchmark-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 30px; }
+        .benchmark-card {
+            background: rgba(255,255,255,0.95); border-radius: 20px; padding: 30px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1); transition: all 0.3s ease;
+        }
+        .benchmark-card:hover { transform: translateY(-5px); }
+        .card-title { font-size: 1.5rem; color: #2c3e50; margin-bottom: 20px; text-align: center; }
+        .latency-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+        .latency-table th, .latency-table td { padding: 12px; text-align: left; border-bottom: 1px solid #e2e8f0; }
+        .latency-table th { background: #f8f9fa; font-weight: 600; color: #495057; }
+        .latency-bar-container { margin: 8px 0; }
+        .latency-bar { height: 20px; background: #e2e8f0; border-radius: 10px; overflow: hidden; position: relative; }
+        .latency-fill { height: 100%; transition: width 0.8s ease; }
+        .comparison-tool { margin-top: 30px; }
+        .input-group { margin-bottom: 15px; }
+        .input-group label { display: block; margin-bottom: 8px; font-weight: 600; color: #495057; }
+        .input-group input, .input-group select {
+            width: 100%; padding: 12px; border: 2px solid #e2e8f0; border-radius: 8px;
+            font-size: 16px; transition: border-color 0.3s ease;
+        }
+        .calculate-btn {
+            width: 100%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; border: none; padding: 15px; border-radius: 10px;
+            font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.3s ease;
+        }
+        .calculate-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3); }
+        .result-section { margin-top: 20px; padding: 20px; background: #f8f9fa; border-radius: 10px; }
+        .scenario-card { background: white; border-radius: 15px; padding: 20px; margin: 15px 0; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        .scenario-title { font-size: 1.2rem; color: #2c3e50; margin-bottom: 10px; font-weight: 600; }
+        .scenario-desc { color: #666; margin-bottom: 15px; }
+        .scenario-calc { background: #f8f9fa; padding: 15px; border-radius: 8px; font-family: monospace; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Latency Numbers Every Programmer Should Know</h1>
+            <p>Essential performance benchmarks for system design estimation</p>
+            <p><em>Based on Jeff Dean's famous numbers, updated for modern hardware</em></p>
+        </div>
+
+        <div class="benchmark-grid">
+            <!-- Main Latency Numbers -->
+            <div class="benchmark-card">
+                <h2 class="card-title">2024 Latency Benchmarks</h2>
+                <table class="latency-table" id="latencyTable">
+                    <thead>
+                        <tr>
+                            <th>Operation</th>
+                            <th>Latency</th>
+                            <th>Relative</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr data-latency="0.5">
+                            <td>L1 cache reference</td>
+                            <td>0.5 ns</td>
+                            <td><div class="latency-bar-container"><div class="latency-bar"><div class="latency-fill" style="background: #28a745; width: 1%;"></div></div></div></td>
+                        </tr>
+                        <tr data-latency="7">
+                            <td>L2 cache reference</td>
+                            <td>7 ns</td>
+                            <td><div class="latency-bar-container"><div class="latency-bar"><div class="latency-fill" style="background: #28a745; width: 14%;"></div></div></div></td>
+                        </tr>
+                        <tr data-latency="100">
+                            <td>Main memory reference</td>
+                            <td>100 ns</td>
+                            <td><div class="latency-bar-container"><div class="latency-bar"><div class="latency-fill" style="background: #ffc107; width: 100%;"></div></div></div></td>
+                        </tr>
+                        <tr data-latency="150000">
+                            <td>SSD random read</td>
+                            <td>150 μs</td>
+                            <td><div class="latency-bar-container"><div class="latency-bar"><div class="latency-fill" style="background: #fd7e14; width: 100%;"></div></div></div></td>
+                        </tr>
+                        <tr data-latency="10000000">
+                            <td>HDD random read</td>
+                            <td>10 ms</td>
+                            <td><div class="latency-bar-container"><div class="latency-bar"><div class="latency-fill" style="background: #dc3545; width: 100%;"></div></div></div></td>
+                        </tr>
+                        <tr data-latency="500000">
+                            <td>Network: Same datacenter</td>
+                            <td>0.5 ms</td>
+                            <td><div class="latency-bar-container"><div class="latency-bar"><div class="latency-fill" style="background: #6610f2; width: 50%;"></div></div></div></td>
+                        </tr>
+                        <tr data-latency="150000000">
+                            <td>Network: Cross-continental</td>
+                            <td>150 ms</td>
+                            <td><div class="latency-bar-container"><div class="latency-bar"><div class="latency-fill" style="background: #e83e8c; width: 100%;"></div></div></div></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- System Performance Calculator -->
+            <div class="benchmark-card">
+                <h2 class="card-title">System Performance Calculator</h2>
+                <div class="input-group">
+                    <label for="requests">Requests per Second</label>
+                    <input type="number" id="requests" placeholder="1000" value="1000">
+                </div>
+                <div class="input-group">
+                    <label for="operationType">Primary Operation Type</label>
+                    <select id="operationType">
+                        <option value="memory">Memory Access (100 ns)</option>
+                        <option value="ssd">SSD Read (150 μs)</option>
+                        <option value="hdd">HDD Read (10 ms)</option>
+                        <option value="network-local">Network Local (0.5 ms)</option>
+                        <option value="network-remote">Network Remote (150 ms)</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label for="operationsPerRequest">Operations per Request</label>
+                    <input type="number" id="operationsPerRequest" placeholder="5" value="5">
+                </div>
+                <button class="calculate-btn" onclick="calculateSystemPerformance()">Calculate Performance</button>
+                <div class="result-section" id="performanceResult" style="display: none;">
+                    <h3>Performance Analysis</h3>
+                    <div id="performanceDetails"></div>
+                </div>
+            </div>
+
+            <!-- Capacity Planning Tool -->
+            <div class="benchmark-card">
+                <h2 class="card-title">Capacity Planning</h2>
+                <div class="input-group">
+                    <label for="targetQPS">Target QPS</label>
+                    <input type="number" id="targetQPS" placeholder="10000" value="10000">
+                </div>
+                <div class="input-group">
+                    <label for="responseTime">Max Response Time (ms)</label>
+                    <input type="number" id="responseTime" placeholder="100" value="100">
+                </div>
+                <div class="input-group">
+                    <label for="systemType">System Type</label>
+                    <select id="systemType">
+                        <option value="cpu-intensive">CPU Intensive</option>
+                        <option value="memory-intensive">Memory Intensive</option>
+                        <option value="io-intensive">I/O Intensive</option>
+                        <option value="network-intensive">Network Intensive</option>
+                    </select>
+                </div>
+                <button class="calculate-btn" onclick="calculateCapacity()">Plan Capacity</button>
+                <div class="result-section" id="capacityResult" style="display: none;">
+                    <h3>Capacity Recommendations</h3>
+                    <div id="capacityDetails"></div>
+                </div>
+            </div>
+
+            <!-- Real-world Scenarios -->
+            <div class="benchmark-card">
+                <h2 class="card-title">Real-world Scenarios</h2>
+                <div id="scenarios">
+                    <div class="scenario-card">
+                        <div class="scenario-title">Database Query Optimization</div>
+                        <div class="scenario-desc">A web application makes 3 database queries per user request. Each query takes 50ms on average.</div>
+                        <div class="scenario-calc">
+                            Total latency: 3 × 50ms = 150ms per request<br>
+                            Max QPS: 1000ms ÷ 150ms ≈ 6.7 requests/second per server
+                        </div>
+                    </div>
+                    
+                    <div class="scenario-card">
+                        <div class="scenario-title">Microservices Chain</div>
+                        <div class="scenario-desc">API Gateway → Auth Service → Business Logic → Database. Each hop adds 2ms network latency.</div>
+                        <div class="scenario-calc">
+                            Network latency: 4 hops × 2ms = 8ms<br>
+                            Processing time: ~20ms<br>
+                            Total: 28ms per request
+                        </div>
+                    </div>
+                    
+                    <div class="scenario-card">
+                        <div class="scenario-title">CDN vs Origin Server</div>
+                        <div class="scenario-desc">Static content delivery comparison between CDN edge and origin server.</div>
+                        <div class="scenario-calc">
+                            CDN edge: 20ms (local)<br>
+                            Origin server: 150ms (cross-continental)<br>
+                            Improvement: 86.7% faster with CDN
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const latencyValues = {
+            'memory': 100, // nanoseconds
+            'ssd': 150000, // nanoseconds (150 microseconds)
+            'hdd': 10000000, // nanoseconds (10 milliseconds)
+            'network-local': 500000, // nanoseconds (0.5 milliseconds)
+            'network-remote': 150000000 // nanoseconds (150 milliseconds)
+        };
+
+        function calculateSystemPerformance() {
+            const requests = parseFloat(document.getElementById('requests').value);
+            const operationType = document.getElementById('operationType').value;
+            const operationsPerRequest = parseFloat(document.getElementById('operationsPerRequest').value);
+
+            if (isNaN(requests) || isNaN(operationsPerRequest)) {
+                alert('Please enter valid numbers');
+                return;
+            }
+
+            const latencyPerOperation = latencyValues[operationType];
+            const totalLatencyNs = latencyPerOperation * operationsPerRequest;
+            const totalLatencyMs = totalLatencyNs / 1000000;
+            
+            const maxQPS = 1000 / totalLatencyMs;
+            const bottleneck = requests > maxQPS;
+            
+            const resultDiv = document.getElementById('performanceResult');
+            const detailsDiv = document.getElementById('performanceDetails');
+            
+            let html = `
+                <div style="margin-bottom: 15px;">
+                    <strong>Request Analysis:</strong><br>
+                    • Operations per request: ${operationsPerRequest}<br>
+                    • Latency per operation: ${formatLatency(latencyPerOperation)}<br>
+                    • Total latency per request: ${totalLatencyMs.toFixed(2)} ms
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <strong>Performance Metrics:</strong><br>
+                    • Target QPS: ${requests.toLocaleString()}<br>
+                    • Theoretical max QPS: ${maxQPS.toFixed(0)}<br>
+                    • Status: <span style="color: ${bottleneck ? '#dc3545' : '#28a745'}; font-weight: 600;">
+                        ${bottleneck ? 'BOTTLENECK DETECTED' : 'WITHIN CAPACITY'}
+                    </span>
+                </div>
+            `;
+            
+            if (bottleneck) {
+                const serversNeeded = Math.ceil(requests / maxQPS);
+                html += `
+                    <div style="background: #fff3cd; border: 1px solid #ffeaa7; padding: 15px; border-radius: 8px;">
+                        <strong>Recommendations:</strong><br>
+                        • Servers needed: ${serversNeeded}<br>
+                        • Consider caching for ${operationType === 'hdd' ? 'HDD' : operationType} operations<br>
+                        • Optimize query patterns to reduce operations per request
+                    </div>
+                `;
+            }
+            
+            detailsDiv.innerHTML = html;
+            resultDiv.style.display = 'block';
+        }
+
+        function calculateCapacity() {
+            const targetQPS = parseFloat(document.getElementById('targetQPS').value);
+            const responseTime = parseFloat(document.getElementById('responseTime').value);
+            const systemType = document.getElementById('systemType').value;
+
+            if (isNaN(targetQPS) || isNaN(responseTime)) {
+                alert('Please enter valid numbers');
+                return;
+            }
+
+            const capacityFactors = {
+                'cpu-intensive': { servers: 0.8, memory: 16, description: 'High CPU utilization, moderate memory' },
+                'memory-intensive': { servers: 0.6, memory: 64, description: 'High memory usage, moderate CPU' },
+                'io-intensive': { servers: 0.4, memory: 32, description: 'I/O bound, needs fast storage' },
+                'network-intensive': { servers: 0.5, memory: 24, description: 'Network bound, needs bandwidth' }
+            };
+
+            const factor = capacityFactors[systemType];
+            const requestsPerSecondPerServer = 1000 / responseTime * factor.servers;
+            const serversNeeded = Math.ceil(targetQPS / requestsPerSecondPerServer);
+            const totalMemoryGB = serversNeeded * factor.memory;
+            
+            const resultDiv = document.getElementById('capacityResult');
+            const detailsDiv = document.getElementById('capacityDetails');
+            
+            const html = `
+                <div style="margin-bottom: 15px;">
+                    <strong>System Requirements:</strong><br>
+                    • Target QPS: ${targetQPS.toLocaleString()}<br>
+                    • Max response time: ${responseTime} ms<br>
+                    • System type: ${systemType.replace('-', ' ').toUpperCase()}
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <strong>Capacity Plan:</strong><br>
+                    • Servers needed: ${serversNeeded}<br>
+                    • Requests per server: ${requestsPerSecondPerServer.toFixed(0)} QPS<br>
+                    • Total memory: ${totalMemoryGB} GB<br>
+                    • Memory per server: ${factor.memory} GB
+                </div>
+                <div style="background: #d1ecf1; border: 1px solid #bee5eb; padding: 15px; border-radius: 8px;">
+                    <strong>Architecture Notes:</strong><br>
+                    ${factor.description}<br><br>
+                    <strong>Additional Considerations:</strong><br>
+                    • Add 20-30% overhead for peak traffic<br>
+                    • Implement load balancing across ${serversNeeded} servers<br>
+                    • Consider auto-scaling for traffic spikes
+                </div>
+            `;
+            
+            detailsDiv.innerHTML = html;
+            resultDiv.style.display = 'block';
+        }
+
+        function formatLatency(nanoseconds) {
+            if (nanoseconds < 1000) return `${nanoseconds} ns`;
+            if (nanoseconds < 1000000) return `${(nanoseconds / 1000).toFixed(1)} μs`;
+            if (nanoseconds < 1000000000) return `${(nanoseconds / 1000000).toFixed(1)} ms`;
+            return `${(nanoseconds / 1000000000).toFixed(1)} s`;
+        }
+
+        // Animate the latency bars on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            const rows = document.querySelectorAll('[data-latency]');
+            const maxLatency = Math.max(...Array.from(rows).map(row => parseFloat(row.dataset.latency)));
+            
+            setTimeout(() => {
+                rows.forEach(row => {
+                    const latency = parseFloat(row.dataset.latency);
+                    const percentage = (latency / maxLatency) * 100;
+                    const fill = row.querySelector('.latency-fill');
+                    fill.style.width = `${Math.max(percentage, 5)}%`; // Minimum 5% for visibility
+                });
+            }, 500);
+        });
+    </script>
+</body>
+</html>

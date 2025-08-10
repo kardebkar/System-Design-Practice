@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapter 2: Back-of-the-Envelope Estimation Dashboard</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh; padding: 20px; color: #333;
+        }
+        .container { max-width: 1400px; margin: 0 auto; }
+        .header {
+            text-align: center; color: white; margin-bottom: 40px; padding: 40px 20px;
+            background: rgba(255,255,255,0.1); border-radius: 20px; backdrop-filter: blur(20px);
+        }
+        .header h1 { font-size: 3rem; margin-bottom: 15px; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); }
+        .header p { font-size: 1.2rem; margin-bottom: 10px; opacity: 0.95; }
+        .tools-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 30px; margin-bottom: 40px; }
+        .tool-card {
+            background: rgba(255,255,255,0.95); border-radius: 20px; padding: 30px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1); transition: all 0.3s ease;
+            cursor: pointer; position: relative; overflow: hidden;
+        }
+        .tool-card:hover { transform: translateY(-5px); box-shadow: 0 16px 48px rgba(0,0,0,0.15); }
+        .tool-card::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+        }
+        .tool-icon { font-size: 3rem; margin-bottom: 20px; text-align: center; }
+        .tool-title { font-size: 1.5rem; color: #2c3e50; margin-bottom: 15px; font-weight: 700; }
+        .tool-description { color: #666; line-height: 1.5; margin-bottom: 20px; }
+        .tool-features { list-style: none; margin-bottom: 20px; }
+        .tool-features li { padding: 5px 0; color: #495057; }
+        .tool-features li:before { content: "✓ "; color: #28a745; font-weight: bold; }
+        .launch-btn {
+            width: 100%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; border: none; padding: 15px; border-radius: 10px;
+            font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.3s ease;
+        }
+        .launch-btn:hover { background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%); }
+        .concepts-section {
+            background: rgba(255,255,255,0.95); border-radius: 20px; padding: 40px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1); margin-bottom: 40px;
+        }
+        .concepts-title { font-size: 2rem; color: #2c3e50; margin-bottom: 30px; text-align: center; }
+        .concepts-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 25px; }
+        .concept-card { background: #f8f9fa; padding: 25px; border-radius: 15px; border-left: 4px solid #667eea; }
+        .concept-title { font-size: 1.2rem; color: #2c3e50; margin-bottom: 15px; font-weight: 600; }
+        .concept-text { color: #666; line-height: 1.6; }
+        .formula { background: #e3f2fd; padding: 15px; border-radius: 8px; margin: 10px 0; font-family: monospace; }
+        .examples-section {
+            background: rgba(255,255,255,0.95); border-radius: 20px; padding: 40px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1); margin-bottom: 40px;
+        }
+        .examples-title { font-size: 2rem; color: #2c3e50; margin-bottom: 30px; text-align: center; }
+        .example-card {
+            background: white; border-radius: 15px; padding: 25px; margin-bottom: 25px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1); border-left: 4px solid #28a745;
+        }
+        .example-title { font-size: 1.3rem; color: #2c3e50; margin-bottom: 15px; font-weight: 600; }
+        .example-scenario { color: #666; margin-bottom: 15px; line-height: 1.5; }
+        .example-calculation { background: #f8f9fa; padding: 15px; border-radius: 8px; font-family: monospace; }
+        .navigation {
+            text-align: center; margin-top: 40px;
+        }
+        .nav-btn {
+            background: rgba(255,255,255,0.2); color: white; border: none;
+            padding: 15px 30px; border-radius: 25px; margin: 0 10px;
+            font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+        .nav-btn:hover { background: rgba(255,255,255,0.3); transform: translateY(-2px); }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Chapter 2: Back-of-the-Envelope Estimation</h1>
+            <p>Master the art of system scale estimation with interactive tools</p>
+            <p><em>Following Alex Xu's "System Design Interview: An Insider's Guide"</em></p>
+        </div>
+
+        <!-- Interactive Tools -->
+        <div class="tools-grid">
+            <div class="tool-card" onclick="window.open('../tools/power-of-two-calculator/index.html', '_blank')">
+                <div class="tool-icon">🔢</div>
+                <div class="tool-title">Power of Two Calculator</div>
+                <div class="tool-description">
+                    Essential data volume conversions and memory calculations for system design.
+                </div>
+                <ul class="tool-features">
+                    <li>Unit converter (Bytes to Petabytes)</li>
+                    <li>Powers of two reference table</li>
+                    <li>Real-world data size examples</li>
+                    <li>Storage visualization tools</li>
+                </ul>
+                <button class="launch-btn">Launch Calculator</button>
+            </div>
+
+            <div class="tool-card" onclick="window.open('../tools/latency-benchmark/index.html', '_blank')">
+                <div class="tool-icon">⚡</div>
+                <div class="tool-title">Latency Numbers Benchmark</div>
+                <div class="tool-description">
+                    Performance benchmarks and latency calculations for modern systems.
+                </div>
+                <ul class="tool-features">
+                    <li>Updated 2024 latency numbers</li>
+                    <li>System performance calculator</li>
+                    <li>Capacity planning tools</li>
+                    <li>Real-world scenarios</li>
+                </ul>
+                <button class="launch-btn">Launch Benchmark</button>
+            </div>
+
+            <div class="tool-card" onclick="window.open('../tools/twitter-example/index.html', '_blank')">
+                <div class="tool-icon">🐦</div>
+                <div class="tool-title">Twitter Scale Estimation</div>
+                <div class="tool-description">
+                    Step-by-step walkthrough of estimating Twitter-scale system requirements.
+                </div>
+                <ul class="tool-features">
+                    <li>Interactive assumption modeling</li>
+                    <li>QPS calculation with peaks</li>
+                    <li>Storage estimation over time</li>
+                    <li>System design recommendations</li>
+                </ul>
+                <button class="launch-btn">Start Estimation</button>
+            </div>
+
+            <div class="tool-card" onclick="alert('Coming soon! QPS Estimator for various system types.')">
+                <div class="tool-icon">📊</div>
+                <div class="tool-title">QPS Estimator</div>
+                <div class="tool-description">
+                    Calculate queries per second for different system architectures.
+                </div>
+                <ul class="tool-features">
+                    <li>Read/Write ratio analysis</li>
+                    <li>Peak load calculations</li>
+                    <li>Database sizing</li>
+                    <li>Server capacity planning</li>
+                </ul>
+                <button class="launch-btn">Coming Soon</button>
+            </div>
+
+            <div class="tool-card" onclick="alert('Coming soon! Storage Calculator for long-term planning.')">
+                <div class="tool-icon">💾</div>
+                <div class="tool-title">Storage Calculator</div>
+                <div class="tool-description">
+                    Estimate storage needs for text, media, and metadata over time.
+                </div>
+                <ul class="tool-features">
+                    <li>Growth projection modeling</li>
+                    <li>Retention policy impact</li>
+                    <li>Media vs text ratios</li>
+                    <li>Cost estimation</li>
+                </ul>
+                <button class="launch-btn">Coming Soon</button>
+            </div>
+
+            <div class="tool-card" onclick="alert('Coming soon! Bandwidth Calculator for network planning.')">
+                <div class="tool-icon">🌐</div>
+                <div class="tool-title">Bandwidth Calculator</div>
+                <div class="tool-description">
+                    Network bandwidth requirements and CDN sizing calculations.
+                </div>
+                <ul class="tool-features">
+                    <li>Geographic distribution</li>
+                    <li>CDN vs origin traffic</li>
+                    <li>Video streaming bandwidth</li>
+                    <li>Mobile vs desktop usage</li>
+                </ul>
+                <button class="launch-btn">Coming Soon</button>
+            </div>
+        </div>
+
+        <!-- Key Concepts -->
+        <div class="concepts-section">
+            <div class="concepts-title">Essential Estimation Concepts</div>
+            <div class="concepts-grid">
+                <div class="concept-card">
+                    <div class="concept-title">Powers of Two</div>
+                    <div class="concept-text">
+                        Understanding binary data units is crucial for accurate calculations:
+                        <div class="formula">
+                            2^10 = 1,024 ≈ 1K (KB)<br>
+                            2^20 = 1,048,576 ≈ 1M (MB)<br>
+                            2^30 = 1,073,741,824 ≈ 1B (GB)<br>
+                            2^40 ≈ 1T (TB), 2^50 ≈ 1P (PB)
+                        </div>
+                    </div>
+                </div>
+
+                <div class="concept-card">
+                    <div class="concept-title">QPS Fundamentals</div>
+                    <div class="concept-text">
+                        Queries Per Second calculation basics:
+                        <div class="formula">
+                            QPS = Total Operations / Time Period<br>
+                            Peak QPS = Average QPS × Peak Factor<br>
+                            Peak Factor: 2-5x (events: 10x+)
+                        </div>
+                    </div>
+                </div>
+
+                <div class="concept-card">
+                    <div class="concept-title">Storage Estimation</div>
+                    <div class="concept-text">
+                        Calculate storage needs over time:
+                        <div class="formula">
+                            Daily Storage = Users × Actions × Data Size<br>
+                            Total Storage = Daily × Days × Retention<br>
+                            Consider: Text, Media, Metadata, Backups
+                        </div>
+                    </div>
+                </div>
+
+                <div class="concept-card">
+                    <div class="concept-title">Latency Impact</div>
+                    <div class="concept-text">
+                        How latency affects system capacity:
+                        <div class="formula">
+                            Max QPS = 1000ms / Response Time<br>
+                            Example: 100ms response = 10 QPS max<br>
+                            Reduce latency → Increase capacity
+                        </div>
+                    </div>
+                </div>
+
+                <div class="concept-card">
+                    <div class="concept-title">Estimation Rules</div>
+                    <div class="concept-text">
+                        Best practices for back-of-envelope calculations:
+                        • Round numbers for simplicity<br>
+                        • State assumptions clearly<br>
+                        • Focus on process, not precision<br>
+                        • Consider peak vs average load
+                    </div>
+                </div>
+
+                <div class="concept-card">
+                    <div class="concept-title">Common Patterns</div>
+                    <div class="concept-text">
+                        Typical system design estimation flow:
+                        <div class="formula">
+                            1. Clarify requirements & assumptions<br>
+                            2. Estimate scale (users, QPS)<br>
+                            3. Calculate storage needs<br>
+                            4. Estimate bandwidth<br>
+                            5. Design high-level architecture
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Real-world Examples -->
+        <div class="examples-section">
+            <div class="examples-title">Common Interview Scenarios</div>
+            
+            <div class="example-card">
+                <div class="example-title">Social Media Platform (Instagram-like)</div>
+                <div class="example-scenario">
+                    500M users, 50% DAU, 2 posts/day, 80% photos (2MB each), 20% videos (50MB each)
+                </div>
+                <div class="example-calculation">
+DAU = 500M × 50% = 250M users
+Daily posts = 250M × 2 = 500M posts/day
+Photos = 500M × 80% × 2MB = 800TB/day
+Videos = 500M × 20% × 50MB = 5PB/day
+Total storage = ~5.8PB/day
+                </div>
+            </div>
+
+            <div class="example-card">
+                <div class="example-title">Chat System (WhatsApp-like)</div>
+                <div class="example-scenario">
+                    2B users, 60% DAU, 50 messages/day/user, 100 bytes/message average
+                </div>
+                <div class="example-calculation">
+DAU = 2B × 60% = 1.2B users
+Daily messages = 1.2B × 50 = 60B messages/day
+Message QPS = 60B / 86400s ≈ 700K QPS
+Storage/day = 60B × 100 bytes = 6TB/day
+Peak QPS = 700K × 3 = 2.1M QPS
+                </div>
+            </div>
+
+            <div class="example-card">
+                <div class="example-title">Video Streaming (YouTube-like)</div>
+                <div class="example-scenario">
+                    2B users, 30% watch daily, 60min watch time, 5Mbps average bitrate
+                </div>
+                <div class="example-calculation">
+Daily viewers = 2B × 30% = 600M
+Watch hours = 600M × 1hr = 600M hours/day
+Bandwidth = 600M × 5Mbps = 3PB/day throughput
+Storage (new videos) = ~100TB/day
+CDN bandwidth = 3PB/day peak traffic
+                </div>
+            </div>
+        </div>
+
+        <!-- Navigation -->
+        <div class="navigation">
+            <button class="nav-btn" onclick="window.open('../../docs/index.html', '_blank')">
+                ← Chapter 1: System Evolution
+            </button>
+            <button class="nav-btn" onclick="alert('Chapter 3 coming soon!')">
+                Chapter 3: Coming Soon →
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Add some interactive elements
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add hover effects and analytics
+            const toolCards = document.querySelectorAll('.tool-card');
+            toolCards.forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-10px) scale(1.02)';
+                });
+                
+                card.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0) scale(1)';
+                });
+            });
+
+            // Add some example calculations on page load
+            setTimeout(() => {
+                console.log('Chapter 2: Back-of-the-Envelope Estimation Tools Loaded');
+                console.log('Available tools: Power of Two, Latency Benchmark, Twitter Estimation');
+            }, 1000);
+        });
+
+        // Quick calculation helpers
+        function formatBytes(bytes) {
+            const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB'];
+            if (bytes === 0) return '0 Bytes';
+            const i = Math.floor(Math.log(bytes) / Math.log(1024));
+            return Math.round(bytes / Math.pow(1024, i) * 100) / 100 + ' ' + sizes[i];
+        }
+
+        function calculateQPS(operationsPerDay) {
+            return Math.round(operationsPerDay / 86400);
+        }
+
+        function estimateStorage(users, dataPerUser, retentionDays) {
+            const totalBytes = users * dataPerUser * retentionDays;
+            return formatBytes(totalBytes);
+        }
+    </script>
+</body>
+</html>

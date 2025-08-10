@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Power of Two Calculator - System Design Estimation</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh; padding: 20px; color: #333;
+        }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .header {
+            text-align: center; color: white; margin-bottom: 40px; padding: 40px 20px;
+            background: rgba(255,255,255,0.1); border-radius: 20px; backdrop-filter: blur(20px);
+        }
+        .header h1 { font-size: 2.5rem; margin-bottom: 15px; }
+        .calculator-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 30px; }
+        .calculator-card {
+            background: rgba(255,255,255,0.95); border-radius: 20px; padding: 30px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1); transition: all 0.3s ease;
+        }
+        .calculator-card:hover { transform: translateY(-5px); }
+        .card-title { font-size: 1.5rem; color: #2c3e50; margin-bottom: 20px; text-align: center; }
+        .input-group { margin-bottom: 20px; }
+        .input-group label { display: block; margin-bottom: 8px; font-weight: 600; color: #495057; }
+        .input-group input, .input-group select {
+            width: 100%; padding: 12px; border: 2px solid #e2e8f0; border-radius: 8px;
+            font-size: 16px; transition: border-color 0.3s ease;
+        }
+        .input-group input:focus, .input-group select:focus {
+            outline: none; border-color: #667eea;
+        }
+        .convert-btn {
+            width: 100%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; border: none; padding: 15px; border-radius: 10px;
+            font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.3s ease;
+        }
+        .convert-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3); }
+        .result { margin-top: 20px; padding: 20px; background: #f8f9fa; border-radius: 10px; }
+        .result h3 { color: #2c3e50; margin-bottom: 15px; }
+        .conversion-row { display: flex; justify-content: space-between; margin-bottom: 10px; }
+        .conversion-row span:first-child { font-weight: 600; color: #495057; }
+        .conversion-row span:last-child { color: #007bff; font-weight: 600; }
+        .reference-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        .reference-table th, .reference-table td { padding: 12px; text-align: left; border-bottom: 1px solid #e2e8f0; }
+        .reference-table th { background: #f8f9fa; font-weight: 600; color: #495057; }
+        .memory-visual { margin-top: 20px; }
+        .memory-bar { height: 30px; background: #e2e8f0; border-radius: 15px; overflow: hidden; margin: 10px 0; position: relative; }
+        .memory-fill { height: 100%; background: linear-gradient(90deg, #667eea, #764ba2); transition: width 0.5s ease; }
+        .memory-label { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-weight: 600; color: white; text-shadow: 1px 1px 2px rgba(0,0,0,0.5); }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Power of Two Calculator</h1>
+            <p>Essential data volume calculations for system design interviews</p>
+        </div>
+
+        <div class="calculator-grid">
+            <!-- Unit Converter -->
+            <div class="calculator-card">
+                <h2 class="card-title">Unit Converter</h2>
+                <div class="input-group">
+                    <label for="inputValue">Enter Value</label>
+                    <input type="number" id="inputValue" placeholder="1024" step="any">
+                </div>
+                <div class="input-group">
+                    <label for="inputUnit">From Unit</label>
+                    <select id="inputUnit">
+                        <option value="bytes">Bytes</option>
+                        <option value="kb">Kilobytes (KB)</option>
+                        <option value="mb">Megabytes (MB)</option>
+                        <option value="gb">Gigabytes (GB)</option>
+                        <option value="tb">Terabytes (TB)</option>
+                        <option value="pb">Petabytes (PB)</option>
+                    </select>
+                </div>
+                <button class="convert-btn" onclick="convertUnits()">Convert All Units</button>
+                <div class="result" id="conversionResult" style="display: none;">
+                    <h3>Conversions</h3>
+                    <div id="conversions"></div>
+                </div>
+            </div>
+
+            <!-- Powers of Two Reference -->
+            <div class="calculator-card">
+                <h2 class="card-title">Powers of Two Reference</h2>
+                <table class="reference-table">
+                    <thead>
+                        <tr>
+                            <th>Power</th>
+                            <th>Value</th>
+                            <th>Approximate</th>
+                            <th>Unit</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>2^10</td><td>1,024</td><td>~1K</td><td>1 KB</td></tr>
+                        <tr><td>2^20</td><td>1,048,576</td><td>~1M</td><td>1 MB</td></tr>
+                        <tr><td>2^30</td><td>1,073,741,824</td><td>~1B</td><td>1 GB</td></tr>
+                        <tr><td>2^40</td><td>1,099,511,627,776</td><td>~1T</td><td>1 TB</td></tr>
+                        <tr><td>2^50</td><td>1,125,899,906,842,624</td><td>~1P</td><td>1 PB</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Memory Visualization -->
+            <div class="calculator-card">
+                <h2 class="card-title">Storage Visualization</h2>
+                <div class="input-group">
+                    <label for="storageAmount">Storage Amount</label>
+                    <input type="number" id="storageAmount" placeholder="100" step="any">
+                </div>
+                <div class="input-group">
+                    <label for="storageUnit">Storage Unit</label>
+                    <select id="storageUnit">
+                        <option value="gb">Gigabytes (GB)</option>
+                        <option value="tb">Terabytes (TB)</option>
+                        <option value="pb">Petabytes (PB)</option>
+                    </select>
+                </div>
+                <button class="convert-btn" onclick="visualizeStorage()">Visualize Storage</button>
+                <div class="memory-visual" id="storageVisualization" style="display: none;">
+                    <h3>Comparative Size</h3>
+                    <div id="visualBars"></div>
+                </div>
+            </div>
+
+            <!-- Real-world Examples -->
+            <div class="calculator-card">
+                <h2 class="card-title">Real-world Data Examples</h2>
+                <table class="reference-table">
+                    <thead>
+                        <tr>
+                            <th>Data Type</th>
+                            <th>Typical Size</th>
+                            <th>Notes</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Tweet (text)</td><td>~280 bytes</td><td>Character limit</td></tr>
+                        <tr><td>Facebook Post</td><td>~1-2 KB</td><td>With metadata</td></tr>
+                        <tr><td>Email</td><td>~75 KB</td><td>Average size</td></tr>
+                        <tr><td>Web Page</td><td>~2 MB</td><td>Including resources</td></tr>
+                        <tr><td>Photo (compressed)</td><td>~200 KB</td><td>JPEG, mobile quality</td></tr>
+                        <tr><td>Photo (high quality)</td><td>~5 MB</td><td>DSLR, uncompressed</td></tr>
+                        <tr><td>Video (1 min, 1080p)</td><td>~100 MB</td><td>H.264 compression</td></tr>
+                        <tr><td>Movie (2h, 4K)</td><td>~25 GB</td><td>Streaming quality</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const units = {
+            bytes: 1,
+            kb: 1024,
+            mb: 1024 * 1024,
+            gb: 1024 * 1024 * 1024,
+            tb: 1024 * 1024 * 1024 * 1024,
+            pb: 1024 * 1024 * 1024 * 1024 * 1024
+        };
+
+        const unitNames = {
+            bytes: 'Bytes',
+            kb: 'Kilobytes (KB)',
+            mb: 'Megabytes (MB)',
+            gb: 'Gigabytes (GB)',
+            tb: 'Terabytes (TB)',
+            pb: 'Petabytes (PB)'
+        };
+
+        function convertUnits() {
+            const inputValue = parseFloat(document.getElementById('inputValue').value);
+            const inputUnit = document.getElementById('inputUnit').value;
+            
+            if (isNaN(inputValue) || inputValue <= 0) {
+                alert('Please enter a valid positive number');
+                return;
+            }
+
+            const bytes = inputValue * units[inputUnit];
+            const resultDiv = document.getElementById('conversionResult');
+            const conversionsDiv = document.getElementById('conversions');
+            
+            let html = '';
+            for (const [unit, multiplier] of Object.entries(units)) {
+                const convertedValue = bytes / multiplier;
+                const formattedValue = convertedValue >= 1 
+                    ? convertedValue.toLocaleString(undefined, { maximumFractionDigits: 2 })
+                    : convertedValue.toExponential(2);
+                
+                html += `
+                    <div class="conversion-row">
+                        <span>${unitNames[unit]}</span>
+                        <span>${formattedValue}</span>
+                    </div>
+                `;
+            }
+            
+            conversionsDiv.innerHTML = html;
+            resultDiv.style.display = 'block';
+        }
+
+        function visualizeStorage() {
+            const amount = parseFloat(document.getElementById('storageAmount').value);
+            const unit = document.getElementById('storageUnit').value;
+            
+            if (isNaN(amount) || amount <= 0) {
+                alert('Please enter a valid positive number');
+                return;
+            }
+
+            const totalBytes = amount * units[unit];
+            const visualDiv = document.getElementById('storageVisualization');
+            const barsDiv = document.getElementById('visualBars');
+            
+            // Create comparison bars
+            const comparisons = [
+                { name: 'Your Storage', bytes: totalBytes, color: '#667eea' },
+                { name: 'iPhone 256GB', bytes: 256 * units.gb, color: '#28a745' },
+                { name: 'Netflix Library (~15PB)', bytes: 15 * units.pb, color: '#dc3545' },
+                { name: 'Google Drive (15GB free)', bytes: 15 * units.gb, color: '#ffc107' }
+            ];
+            
+            const maxBytes = Math.max(...comparisons.map(c => c.bytes));
+            
+            let html = '';
+            comparisons.forEach(comp => {
+                const percentage = (comp.bytes / maxBytes) * 100;
+                const displaySize = formatBytes(comp.bytes);
+                
+                html += `
+                    <div style="margin-bottom: 15px;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                            <span style="font-weight: 600;">${comp.name}</span>
+                            <span style="color: #007bff; font-weight: 600;">${displaySize}</span>
+                        </div>
+                        <div class="memory-bar">
+                            <div class="memory-fill" style="width: ${percentage}%; background: ${comp.color};"></div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            barsDiv.innerHTML = html;
+            visualDiv.style.display = 'block';
+        }
+
+        function formatBytes(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        // Auto-calculate on input change
+        document.getElementById('inputValue').addEventListener('input', () => {
+            if (document.getElementById('conversionResult').style.display === 'block') {
+                convertUnits();
+            }
+        });
+
+        document.getElementById('inputUnit').addEventListener('change', () => {
+            if (document.getElementById('conversionResult').style.display === 'block') {
+                convertUnits();
+            }
+        });
+    </script>
+</body>
+</html>
