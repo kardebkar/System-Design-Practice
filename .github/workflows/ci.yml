@@ -901,8 +901,8 @@ jobs:
     
     - name: Generate 8-Stage Dashboard
       run: |
-        echo "🚀 Generating 8-stage dashboard..."
-        node create-8stage-workflow.js
+        echo "🚀 Generating interactive 8-stage dashboard..."
+        node .github/scripts/generate-dashboard.js
     
     - name: Setup Pages
       uses: actions/configure-pages@v4
