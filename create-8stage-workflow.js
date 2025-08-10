@@ -1,4 +1,8 @@
-name: Deploy 8-Stage Performance Dashboard to GitHub Pages
+// Script to generate proper 8-stage GitHub Actions workflow
+const fs = require('fs');
+const path = require('path');
+
+const workflow = `name: Deploy 8-Stage Performance Dashboard to GitHub Pages
 
 on:
   push:
@@ -101,16 +105,9 @@ jobs:
           
       - name: 📊 Generate 8-Stage Performance Dashboard
         run: |
-          # Ensure docs directory exists
-          mkdir -p docs
-          
           TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
-          BUILD_NUMBER=${GITHUB_RUN_NUMBER:-"demo"}
-          COMMIT_SHA=${GITHUB_SHA:-"latest"}
-          
-          echo "🚀 Creating 8-stage dashboard with timestamp: $TIMESTAMP"
-          echo "📊 Build number: $BUILD_NUMBER"
-          echo "🔧 Commit SHA: ${COMMIT_SHA:0:7}"
+          BUILD_NUMBER=\${GITHUB_RUN_NUMBER:-"demo"}
+          COMMIT_SHA=\${GITHUB_SHA:-"latest"}
           
           cat > docs/index.html << 'EOF'
 <!DOCTYPE html>
@@ -753,17 +750,9 @@ jobs:
 EOF
 
           # Replace placeholders with actual values
-          echo "🔧 Replacing placeholders..."
-          sed -i.bak "s/BUILD_NUMBER_PLACEHOLDER/$BUILD_NUMBER/g" docs/index.html || echo "Build number replacement failed"
-          sed -i.bak "s/COMMIT_PLACEHOLDER/${GITHUB_SHA:0:7}/g" docs/index.html || echo "Commit replacement failed"
-          sed -i.bak "s/TIMESTAMP_PLACEHOLDER/$TIMESTAMP/g" docs/index.html || echo "Timestamp replacement failed"
-          
-          # Clean up backup files
-          rm -f docs/index.html.bak
-          
-          # Verify the file was created correctly
-          echo "📊 Generated dashboard file size: $(wc -c < docs/index.html) bytes"
-          echo "✅ Dashboard generation complete!"
+          sed -i "s/BUILD_NUMBER_PLACEHOLDER/$BUILD_NUMBER/g" docs/index.html
+          sed -i "s/COMMIT_PLACEHOLDER/\${GITHUB_SHA:0:7}/g" docs/index.html  
+          sed -i "s/TIMESTAMP_PLACEHOLDER/$TIMESTAMP/g" docs/index.html
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
@@ -776,3 +765,16 @@ EOF
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+`;
+
+const filePath = path.join(__dirname, '../../.github/workflows/deploy-pages.yml');
+fs.writeFileSync(filePath, workflow);
+
+console.log('✅ Generated new 8-stage workflow file');
+console.log('📁 Location:', filePath);
+console.log('🚀 Features:');
+console.log('   - Complete 8-stage testing pipeline');
+console.log('   - Professional dashboard design');
+console.log('   - Real performance data integration');
+console.log('   - Interactive charts and visualizations');
+console.log('   - Responsive mobile-first design');
