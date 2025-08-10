@@ -868,6 +868,18 @@ const dashboardHTML = `<!DOCTYPE html>
             padding: 30px;
             box-shadow: 0 4px 20px rgba(0,0,0,0.08);
             border-left: 4px solid #3b82f6;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .stage-content:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+        }
+        .stage-content.expanded {
+            box-shadow: 0 12px 40px rgba(0,0,0,0.15);
+            transform: scale(1.02);
         }
         .stage-number {
             width: 60px;
@@ -942,6 +954,87 @@ const dashboardHTML = `<!DOCTYPE html>
             font-size: 0.8rem;
             color: #64748b;
             margin-top: 5px;
+        }
+
+        /* Interactive Details */
+        .stage-details {
+            max-height: 0;
+            opacity: 0;
+            overflow: hidden;
+            transition: all 0.4s ease;
+            margin-top: 0;
+            border-top: 1px solid transparent;
+        }
+        .stage-details.expanded {
+            max-height: 600px;
+            opacity: 1;
+            margin-top: 25px;
+            border-top: 1px solid #e2e8f0;
+            padding-top: 25px;
+        }
+        .details-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            margin-bottom: 20px;
+        }
+        .detail-section {
+            background: #f8fafc;
+            border-radius: 10px;
+            padding: 20px;
+            border: 1px solid #e2e8f0;
+        }
+        .detail-section h4 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: #0f172a;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .detail-section ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .detail-section li {
+            padding: 6px 0;
+            color: #475569;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .detail-section li:last-child {
+            border-bottom: none;
+        }
+        .detail-section li strong {
+            color: #0f172a;
+        }
+        .architecture-diagram {
+            background: #f1f5f9;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            margin-top: 15px;
+            border: 2px dashed #cbd5e1;
+        }
+        .expand-indicator {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: #3b82f6;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            transition: all 0.3s ease;
+        }
+        .expand-indicator.expanded {
+            transform: rotate(180deg);
+            background: #16a34a;
         }
 
         /* Performance Chart */
@@ -1056,6 +1149,14 @@ const dashboardHTML = `<!DOCTYPE html>
             .stage:nth-child(even) { direction: ltr; }
             .stage-metrics { grid-template-columns: 1fr; }
             .header .metrics { gap: 20px; }
+            .details-grid { grid-template-columns: 1fr; }
+            .expand-indicator {
+                top: 15px;
+                right: 15px;
+                width: 25px;
+                height: 25px;
+                font-size: 14px;
+            }
         }
     </style>
 </head>
@@ -1091,7 +1192,8 @@ const dashboardHTML = `<!DOCTYPE html>
             <div class="evolution-timeline">
                 
                 <div class="stage">
-                    <div class="stage-content">
+                    <div class="stage-content" onclick="toggleStageDetails(1)">
+                        <div class="expand-indicator" id="indicator-1">+</div>
                         <h3 class="stage-title">Stage 1: SQLite Foundation</h3>
                         <div class="stage-problem">
                             <h4>The Problem</h4>
@@ -1115,6 +1217,34 @@ const dashboardHTML = `<!DOCTYPE html>
                                 <span class="label">Success Rate</span>
                             </div>
                         </div>
+                        <div class="stage-details" id="details-1">
+                            <div class="details-grid">
+                                <div class="detail-section">
+                                    <h4>🏗️ Technical Implementation</h4>
+                                    <ul>
+                                        <li><strong>Database:</strong> SQLite file-based storage</li>
+                                        <li><strong>Server:</strong> Single Express.js instance</li>
+                                        <li><strong>Connection Pool:</strong> None (file locking)</li>
+                                        <li><strong>Concurrency:</strong> Write locks block reads</li>
+                                        <li><strong>Scaling:</strong> Vertical only</li>
+                                    </ul>
+                                </div>
+                                <div class="detail-section">
+                                    <h4>📊 Performance Analysis</h4>
+                                    <ul>
+                                        <li><strong>10 users:</strong> 100ms response</li>
+                                        <li><strong>50 users:</strong> 648ms response</li>
+                                        <li><strong>100 users:</strong> 1,779ms response</li>
+                                        <li><strong>Breaking Point:</strong> 100 concurrent users</li>
+                                        <li><strong>Main Bottleneck:</strong> Database locking</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="architecture-diagram">
+                                <strong>Simple Architecture:</strong> Client → Express.js → SQLite File<br>
+                                <em>Single point of failure, limited concurrency</em>
+                            </div>
+                        </div>
                     </div>
                     <div class="stage-number">1</div>
                     <div></div>
@@ -1123,7 +1253,8 @@ const dashboardHTML = `<!DOCTYPE html>
                 <div class="stage">
                     <div></div>
                     <div class="stage-number">2</div>
-                    <div class="stage-content">
+                    <div class="stage-content" onclick="toggleStageDetails(2)">
+                        <div class="expand-indicator" id="indicator-2">+</div>
                         <h3 class="stage-title">Stage 2: PostgreSQL Upgrade</h3>
                         <div class="stage-problem">
                             <h4>The Problem</h4>
@@ -1145,6 +1276,34 @@ const dashboardHTML = `<!DOCTYPE html>
                             <div class="metric-box">
                                 <span class="value">95%</span>
                                 <span class="label">Success Rate</span>
+                            </div>
+                        </div>
+                        <div class="stage-details" id="details-2">
+                            <div class="details-grid">
+                                <div class="detail-section">
+                                    <h4>🔧 Technical Improvements</h4>
+                                    <ul>
+                                        <li><strong>Database:</strong> PostgreSQL with connection pooling</li>
+                                        <li><strong>ACID Compliance:</strong> Full transaction support</li>
+                                        <li><strong>Concurrency:</strong> Multiple simultaneous connections</li>
+                                        <li><strong>Indexing:</strong> B-tree indexes for faster queries</li>
+                                        <li><strong>Backup:</strong> WAL-based point-in-time recovery</li>
+                                    </ul>
+                                </div>
+                                <div class="detail-section">
+                                    <h4>📈 Performance Gains</h4>
+                                    <ul>
+                                        <li><strong>55% faster:</strong> 100ms → 45ms response</li>
+                                        <li><strong>2x users:</strong> 100 → 200 concurrent</li>
+                                        <li><strong>95% success rate:</strong> Better reliability</li>
+                                        <li><strong>Connection pooling:</strong> Efficient resource usage</li>
+                                        <li><strong>Next bottleneck:</strong> Single app server</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="architecture-diagram">
+                                <strong>Upgraded Architecture:</strong> Client → Express.js → PostgreSQL (with pooling)<br>
+                                <em>Better concurrency, ACID compliance, but still single app server</em>
                             </div>
                         </div>
                     </div>
